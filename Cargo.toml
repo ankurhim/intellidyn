@@ -1,0 +1,21 @@
+[package]
+name = "intellidyn"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lambda_http = "0.6.1"
+aws-config = "0.48.0"
+aws-sdk-dynamodb = "0.18.0"
+tokio = { version = "1", features = ["full"] }
+tracing = { version = "0.1.36", features = ["log"] }
+tracing-subscriber = { version = "0.3.15", default-features = false, features = ["fmt"] }
+tower-http = { version = "0.3.4", features = ["cors"] }
+serde_dynamo = { version = "4.0.6", features = ["aws-sdk-dynamodb+0_18"] }
+serde = "1.0.144"
+
+[[bin]]
+name = "intellidyn"
+path = "src/main.rs"
