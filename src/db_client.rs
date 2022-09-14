@@ -76,20 +76,20 @@ impl DynamodbClient {
         Ok(result)
     }
 
-    // pub async fn list_items<'a, T: Deserialize<'a>>(&self, table: &str) -> Result<Vec<T>, serde_dynamo::Error> {
-    //     let result: ScanOutput = self.db_client
-    //     .scan()
-    //     .table_name(table)
-    //     .send()
-    //     .await?;
+    pub async fn list_items<'a, T: Deserialize<'a>>(&self, table: &str) -> Result<Vec<T>, Error> {
+        let result: ScanOutput = self.db_client
+        .scan()
+        .table_name(table)
+        .send()
+        .await?;
     
-    //     let mut list = Vec::new();
+        let mut list = Vec::new();
         
-    //     for item in result.items.unwrap() {
-    //         let obj: T = from_item(item)?;
-    //         list.push(obj)
-    //     }
+        for item in result.items.unwrap() {
+            let obj: T = from_item(item)?;
+            list.push(obj)
+        }
     
-    //     Ok(list)
-    // }
+        Ok(list)
+    }
 }
