@@ -13,6 +13,7 @@ use aws_sdk_dynamodb::{
 };
 use serde_dynamo::aws_sdk_dynamodb_0_18::from_item;
 use serde::Deserialize;
+use crate::errors::CustomError;
 
 #[derive(Debug)]
 pub struct DynamodbClient {
@@ -76,7 +77,7 @@ impl DynamodbClient {
         Ok(result)
     }
 
-    pub async fn list_items<'a, T: Deserialize<'a>>(&self, table: &str) -> Result<Vec<T>, Error> {
+    pub async fn list_items<'a, T: Deserialize<'a>>(&self, table: &str) -> Result<Vec<T>, CustomError> {
         let result: ScanOutput = self.db_client
         .scan()
         .table_name(table)

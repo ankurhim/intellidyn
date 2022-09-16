@@ -1,6 +1,7 @@
 mod db_client;
 mod handler;
 mod apis;
+mod errors;
 
 use lambda_http::{service_fn, Error, tower::ServiceBuilder};
 use tower_http::cors::{ CorsLayer, Any};

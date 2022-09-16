@@ -1,7 +1,10 @@
-use lambda_http::{Body, Error, Request, IntoResponse, RequestExt, Response};
+use lambda_http::{Body, Request, RequestExt, Response};
 use crate::db_client::DynamodbClient;
+use crate::apis::company::company_config;
+use hyper::Method;
+use crate::errors::CustomError;
 
-pub async fn handler(event: Request) -> Result<Response<Body>, Error> {
+pub async fn handler(event: Request) -> Result<Response<Body>, CustomError> {
 
     let client = DynamodbClient::init().await?;
 
@@ -11,15 +14,11 @@ pub async fn handler(event: Request) -> Result<Response<Body>, Error> {
         Err(e) => format!("Error {:?}", e)
     };
 
-    Ok(match event.query_string_parameters().first("first_name") {
-        Some(v) => {
-            format!("{}: Client invoked by {:#?}. {:?}", event.lambda_context().request_id, v, resp)
-            .into_response()
-            .await
-        },
+    Ok(match &event.raw_http_path()[..] {
+        "company" => company_config::resolve_routes(Method::POST, "/company", event).await.unwrap(),
         _ => Response::builder()
-        .status(400)
-        .body("Empty first name".into())
-        .expect("failed to render response"),
+        .status(404)
+        .body(Body::from("Page not found"))
+        .map_err(Box::new).unwrap(),
     })
 }
