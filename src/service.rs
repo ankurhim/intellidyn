@@ -2,13 +2,17 @@ use tokio_postgres::{Client, Error};
 use native_tls::{Certificate, TlsConnector};
 use postgres_native_tls::MakeTlsConnector;
 use std::fs;
+use dotenv;
 
+#[derive(Debug)]
 pub struct DbService {
     pub client: Client
 }
 
 impl DbService {
     pub async fn new() -> Result<Self,Error> {
+        dotenv::dotenv().ok();
+
         let read_cert = fs::read("root.crt").unwrap();
     
         let cert = Certificate::from_pem(&read_cert).unwrap();
@@ -20,8 +24,10 @@ impl DbService {
         
         let tls_connector = MakeTlsConnector::new(connector);
 
+        let connection_string = std::env::var("CONNECTION_STRING").expect("Connection String is missing!");
+
         let (client, connection) = tokio_postgres::connect(
-            "postgresql://intellidyn:c9eBGw_RVnp4TbCWm1z7CQ@candy-oilbird-8892.5xj.cockroachlabs.cloud:26257/intellidyn_db",
+            &connection_string,
             tls_connector
         )
         .await
