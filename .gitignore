@@ -16,4 +16,4 @@ Cargo.lock
 
 .env
 
-root.crt
+*.crt
