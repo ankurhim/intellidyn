@@ -1,3 +1,5 @@
+mod users;
+
 use axum::{
     routing::{get, post, delete, put},
     Router,
@@ -5,9 +7,10 @@ use axum::{
     response::Json,
 };
 use std::sync::Arc;
-use serde_json::{Value, json};
 
 use crate::service::DbService;
+use crate::routes::users::create_user_routes;
+
 
 pub async fn create_routes() -> Router {
     let client = Arc::new(DbService::new()
@@ -15,12 +18,8 @@ pub async fn create_routes() -> Router {
     .unwrap());
 
     let routes = Router::new()
-    .route("/", get(json))
+    .nest("/users/", create_user_routes().await)
     .layer(Extension(client));
 
     routes
-}
-
-async fn json() -> Json<Value> {
-    Json(json!({ "data": 42.20 }))
 }
