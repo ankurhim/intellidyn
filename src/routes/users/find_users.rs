@@ -1,6 +1,7 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
+use bcrypt::verify;
 use axum::{
     Extension,
     Json,
@@ -14,7 +15,8 @@ use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FindUserRequest {
-    pub username: Option<String>
+    pub username: Option<String>,
+    pub password: Option<String>
 }
 
 #[derive(Debug, Serialize)]
@@ -99,5 +101,56 @@ impl FindUserRequest {
             data: user_vector,
             error: None,
         }))
+    }
+
+    pub async fn user_login(
+        Extension(logged_user): Extension<Arc<User>>,
+        Extension(service): Extension<Arc<DbService>>,
+        Json(payload): Json<FindUserRequest>,
+    ) -> Json<Value> {
+        let mut user_vector: Vec<User> = Vec::new();
+
+        let resp = service.client
+        .query(
+            "SELECT * FROM intellidyn_user WHERE username = $1", &[
+                &payload.username
+                ]
+        )
+        .await
+        .map_err(|e| Json(json!(FindUserResponse {
+            success: false,
+            data: vec![],
+            error: Some(e.to_string())
+        })));
+
+
+        for row in resp.unwrap() {
+            user_vector.push(User {
+                user_pk: Uuid::parse_str(row.get(1)).unwrap(),
+                username: row.get(2),
+                password: row.get(3),
+                created_by: row.get(4),
+                created_on: row.get(5),
+                modified_by: row.get(6),
+                modified_on: row.get(7)
+            })
+        }
+
+        let user = &user_vector[0];
+
+        let login_result = match verify(payload.password.unwrap(), &user.password).unwrap() {
+            true => Json(json!(FindUserResponse {
+                success: true,
+                data: vec![],
+                error: None
+            })),
+            false => Json(json!(FindUserResponse {
+                success: false,
+                data: vec![],
+                error: None
+            })),
+        };
+
+        login_result
     }
 }

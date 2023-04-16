@@ -1,4 +1,5 @@
 pub mod users;
+pub mod auth;
 
 use axum::{
     Router,
@@ -8,6 +9,8 @@ use std::sync::Arc;
 
 use crate::service::DbService;
 use crate::routes::users::create_user_routes;
+use crate::routes::auth::create_auth_routes;
+use crate::routes::auth::user_login::UserLoginRequest;
 use crate::routes::users::user_model::User;
 
 
@@ -20,6 +23,7 @@ pub async fn create_routes() -> Router {
 
     let routes = Router::new()
     .nest("/users/", create_user_routes().await)
+    .nest("/auth/", create_auth_routes().await)
     .layer(Extension(logged_user))
     .layer(Extension(client));
 
