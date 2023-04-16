@@ -1,15 +1,14 @@
-mod users;
+pub mod users;
 
 use axum::{
-    routing::{get, post, delete, put},
     Router,
     Extension,
-    response::Json,
 };
 use std::sync::Arc;
 
 use crate::service::DbService;
 use crate::routes::users::create_user_routes;
+use crate::routes::users::user_model::User;
 
 
 pub async fn create_routes() -> Router {
@@ -17,8 +16,11 @@ pub async fn create_routes() -> Router {
     .await
     .unwrap());
 
+    let logged_user = Arc::new(User::default());
+
     let routes = Router::new()
     .nest("/users/", create_user_routes().await)
+    .layer(Extension(logged_user))
     .layer(Extension(client));
 
     routes

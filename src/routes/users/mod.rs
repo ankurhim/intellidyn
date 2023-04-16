@@ -1,15 +1,28 @@
-mod user_model;
+pub mod user_model;
+pub mod create_user;
+pub mod find_users;
 
+use std::sync::Arc;
 use axum::{
     Router,
-    routing::get,
+    routing::{get, post},
     response::Json,
+    Extension,
 };
+use crate::service::DbService;
+
 use serde_json::{Value, json};
-use self::user_model::User;
+use self::{
+    user_model::User,
+    create_user::CreateUserRequest,
+    find_users::FindUserRequest,
+};
 
 pub async fn create_user_routes() -> Router {
     Router::new()
+    .route("/create_new_user", post(CreateUserRequest::create_new_user))
+    .route("/find_users", get(FindUserRequest::find_users))
+    .route("/find_user_by_id", get(FindUserRequest::find_user_by_id))
     .route("/get_users", get(json))
 }
 
