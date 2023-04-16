@@ -4,7 +4,6 @@ use std::time;
 use std::sync::Arc;
 use bcrypt::{ hash, DEFAULT_COST };
 use axum::{
-    http::StatusCode,
     Extension,
     Json,
 };
@@ -32,7 +31,8 @@ impl CreateUserRequest {
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<Self>,
     ) -> Json<Value> {
-        service.client
+        
+        let _create_table = service.client
         .execute(
             "CREATE TABLE IF NOT EXISTS intellidyn_user (
                 id SERIAL NOT NULL,
@@ -46,7 +46,11 @@ impl CreateUserRequest {
                 UNIQUE (username)
             );", &[]
         ).
-        await;
+        await
+        .map_err(|e| Json(json!(CreateUserResponse {
+            success: false,
+            error: Some(e.to_string())
+        })));
 
         let new_user = User {
             user_pk: Uuid::new_v4(),

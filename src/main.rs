@@ -1,5 +1,3 @@
-use intellidyn::service::DbService;
-use tokio_postgres::Error;
 use intellidyn::run;
 
 #[tokio::main]

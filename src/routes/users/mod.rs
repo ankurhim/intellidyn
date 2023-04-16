@@ -2,14 +2,11 @@ pub mod user_model;
 pub mod create_user;
 pub mod find_users;
 
-use std::sync::Arc;
 use axum::{
     Router,
     routing::{get, post},
     response::Json,
-    Extension,
 };
-use crate::service::DbService;
 
 use serde_json::{Value, json};
 use self::{
