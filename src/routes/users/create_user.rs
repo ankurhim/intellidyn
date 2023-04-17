@@ -22,6 +22,7 @@ pub struct CreateUserRequest {
 #[derive(Debug, Serialize)]
 pub struct CreateUserResponse {
     pub success: bool,
+    pub data: Option<String>,
     pub error: Option<String>
 }
 
@@ -49,6 +50,7 @@ impl CreateUserRequest {
         await
         .map_err(|e| Json(json!(CreateUserResponse {
             success: false,
+            data: None,
             error: Some(e.to_string())
         })));
 
@@ -97,15 +99,20 @@ impl CreateUserRequest {
             ]
         )
         .await
-        .map(|_| Json(json!(CreateUserResponse {
+        .map(|val| Json(json!(CreateUserResponse {
             success: true,
+            data: Some(format!("{:?}", val)),
             error: None
         })))
         .map_err(|e| Json(json!(CreateUserResponse {
             success: false,
+            data: None,
             error: Some(e.to_string())
         })));
 
-        resp.unwrap()
+        match resp {
+            Ok(v) => v,
+            Err(e) => e
+        }
     }
 }
