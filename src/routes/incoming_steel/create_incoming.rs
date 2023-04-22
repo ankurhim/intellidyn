@@ -1,0 +1,165 @@
+use serde::{Serialize, Deserialize };
+use uuid::Uuid;
+use time::{ Date, macros::format_description};
+use std::sync::Arc;
+use axum::{
+    Extension,
+    Json,
+};
+
+use serde_json::{Value, json};
+
+use crate::routes::incoming_steel::IncomingSteel;
+use crate::routes::User;
+use crate::service::DbService;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateIncomingSteelRequest {
+    pub challan_no: String,
+    pub challan_date: String,
+    pub grade: String,
+    pub section: String,
+    pub heat_no: String,
+    pub heat_code: Option<String>,
+    pub jominy_value: Option<String>,
+    pub received_qty: i64,
+}
+
+#[derive(Debug, Serialize)]
+pub struct CreateIncomingSteelResponse {
+    pub success: bool,
+    pub data: Option<String>,
+    pub error: Option<String>
+}
+
+impl CreateIncomingSteelRequest {
+    pub async fn create_new_incoming_steel(
+        Extension(logged_user): Extension<Arc<User>>,
+        Extension(service): Extension<Arc<DbService>>,
+        Json(payload): Json<Self>,
+    ) -> Json<Value> {
+        
+        let _create_table = service.client
+        .execute(
+            "CREATE TABLE IF NOT EXISTS intellidyn_incoming_material (
+                id SERIAL NOT NULL,
+                incoming_pk TEXT NOT NULL,
+                challan_no TEXT NOT NULL,
+                challan_date DATE NOT NULL,
+                grade TEXT NOT NULL,
+                section TEXT NOT NULL,
+                heat_no TEXT NOT NULL,
+                heat_code TEXT,
+                jominy_value TEXT,
+                received_qty BIGINT NOT NULL,
+                created_by TEXT NOT NULL,
+                created_on TIMESTAMP NOT NULL,
+                modified_by TEXT,
+                modified_on TIMESTAMP,
+                UNIQUE (challan_no, heat_no)
+            );", &[]
+        ).
+        await
+        .map_err(|e| Json(json!(CreateIncomingSteelResponse {
+            success: false,
+            data: None,
+            error: Some(e.to_string())
+        })));
+
+        let date_format = format_description!("yyyy-mm-dd");
+
+        let new_incoming_steel = IncomingSteel {
+            incoming_pk: Uuid::new_v4(),
+            challan_no: payload.challan_no.clone(),
+            challan_date: match Date::parse(&payload.challan_date, date_format) {
+                Ok(v) => v,
+                Err(e) => Date::MAX
+            },
+            grade: payload.grade.clone(),
+            section: payload.section.clone(),
+            heat_no: payload.heat_no.clone(),
+            heat_code: payload.heat_code.clone(),
+            jominy_value: payload.jominy_value.clone(),
+            received_qty: payload.received_qty.clone(),
+            created_by: Some(logged_user.username.to_string()),
+            created_on: std::time::SystemTime::now(),
+            modified_by: None,
+            modified_on: None,
+        };
+
+        let resp = service.client
+        .execute(
+            "INSERT INTO intellidyn_incoming_material (
+                incoming_pk,
+                challan_no,
+                challan_date,
+                grade,
+                section,
+                heat_no,
+                heat_code,
+                jominy_value,
+                received_qty,
+                created_by,
+                created_on,
+                modified_by,
+                modified_on
+            ) VALUES (
+                $1,
+                $2,
+                $3,
+                $4,
+                $5,
+                $6,
+                $7,
+                $8,
+                $9,
+                $10,
+                $11,
+                $12,
+                $13
+            )", &[
+                &new_incoming_steel.incoming_pk.to_string(),
+                &new_incoming_steel.challan_no,
+                &new_incoming_steel.challan_date,
+                &new_incoming_steel.grade,
+                &new_incoming_steel.section,
+                &new_incoming_steel.heat_no,
+                match &new_incoming_steel.heat_code {
+                    Some(v) => v,
+                    _ => &None::<String>
+                },
+                match &new_incoming_steel.jominy_value {
+                    Some(v) => v,
+                    _ => &None::<String>
+                },
+                &new_incoming_steel.received_qty,
+                match &new_incoming_steel.created_by {
+                    Some(v) => v,
+                    _ => &None::<String>
+                },
+                &new_incoming_steel.created_on,
+                match &new_incoming_steel.modified_by {
+                    Some(v) => v,
+                    _ => &None::<String>
+                },
+                &new_incoming_steel.modified_on
+            ]
+        )
+        .await
+        .map(|val| Json(json!(CreateIncomingSteelResponse {
+            success: true,
+            data: Some(format!("{:?}", val)),
+            error: None
+        })))
+        .map_err(|e| Json(json!(CreateIncomingSteelResponse {
+            success: false,
+            data: None,
+            error: Some(e.to_string())
+        })));
+
+        match resp {
+            Ok(v) => v,
+            Err(e) => e
+        }
+    }
+}

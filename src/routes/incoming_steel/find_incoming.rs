@@ -1,6 +1,7 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
+use bcrypt::verify;
 use axum::{
     Extension,
     Json,

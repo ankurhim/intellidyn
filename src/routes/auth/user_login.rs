@@ -14,8 +14,10 @@ use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserLoginRequest {
+    pub full_name: Option<String>,
     pub username: Option<String>,
-    pub password: Option<String>
+    pub password: Option<String>,
+    pub phone_no: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -47,12 +49,14 @@ impl UserLoginRequest {
 
         let user = User {
             user_pk: Uuid::parse_str(result.get(1)).unwrap(),
-            username: result.get(2),
-            password: result.get(3),
-            created_by: result.get(4),
-            created_on: result.get(5),
-            modified_by: result.get(6),
-            modified_on: result.get(7)
+            full_name: result.get(2),
+            username: result.get(3),
+            password: result.get(4),
+            phone_no: result.get(5),
+            created_by: result.get(6),
+            created_on: result.get(7),
+            modified_by: result.get(8),
+            modified_on: result.get(9)
         };
 
         let login_result = match verify(payload.password.unwrap(), &user.password).unwrap() {

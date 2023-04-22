@@ -15,8 +15,10 @@ use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateUserRequest {
+    pub full_name: String,
     pub username: String,
-    pub password: String
+    pub password: String,
+    pub phone_no: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -38,8 +40,10 @@ impl CreateUserRequest {
             "CREATE TABLE IF NOT EXISTS intellidyn_user (
                 id SERIAL NOT NULL,
                 user_pk TEXT NOT NULL,
+                full_name TEXT NOT NULL,
                 username TEXT NOT NULL,
                 password TEXT NOT NULL,
+                phone_no TEXT,
                 created_by TEXT NOT NULL,
                 created_on TIMESTAMP NOT NULL,
                 modified_by TEXT,
@@ -56,8 +60,13 @@ impl CreateUserRequest {
 
         let new_user = User {
             user_pk: Uuid::new_v4(),
+            full_name: payload.full_name.clone(),
             username: payload.username.clone(),
             password: hash(payload.password.clone(), DEFAULT_COST).expect("Hashing failed"),
+            phone_no: match &payload.phone_no.len() {
+                0 => Some(payload.phone_no),
+                _ => None,
+            },
             created_by: Some(logged_user.username.to_string()),
             created_on: time::SystemTime::now(),
             modified_by: None,
@@ -68,8 +77,10 @@ impl CreateUserRequest {
         .execute(
             "INSERT INTO intellidyn_user(
                 user_pk,
+                full_name,
                 username,
                 password,
+                phone_no,
                 created_by,
                 created_on,
                 modified_by,
@@ -81,11 +92,18 @@ impl CreateUserRequest {
                 $4,
                 $5,
                 $6,
-                $7
+                $7,
+                $8,
+                $9
             )", &[
                 &new_user.user_pk.to_string(),
+                &new_user.full_name,
                 &new_user.username,
                 &new_user.password,
+                match &new_user.phone_no {
+                    Some(v) => v,
+                    _ => &None::<String>
+                },
                 match &new_user.created_by {
                     Some(v) => v,
                     _ => &None::<String>

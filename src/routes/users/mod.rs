@@ -7,12 +7,9 @@ pub mod update_user;
 use axum::{
     Router,
     routing::{get, post, delete, put},
-    response::Json,
 };
 
-use serde_json::{Value, json};
 use self::{
-    user_model::User,
     create_user::CreateUserRequest,
     find_users::FindUserRequest,
     delete_user::DeleteUserRequest,
