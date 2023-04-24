@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
-use time::{ Date, macros::format_description};
+use time::{ Date, macros::{format_description, date}};
 use std::sync::Arc;
 use axum::{
     Extension,
@@ -66,15 +66,12 @@ impl CreateIncomingSteelRequest {
             error: Some(e.to_string())
         })));
 
-        let date_format = format_description!("yyyy-mm-dd");
+        let date_format = format_description!("[day]-[month]-[year]");
 
         let new_incoming_steel = IncomingSteel {
             incoming_pk: Uuid::new_v4(),
             challan_no: payload.challan_no.clone(),
-            challan_date: match Date::parse(&payload.challan_date, date_format) {
-                Ok(v) => v,
-                Err(e) => Date::MAX
-            },
+            challan_date: Date::parse(&payload.challan_date, date_format).unwrap(),
             grade: payload.grade.clone(),
             section: payload.section.clone(),
             heat_no: payload.heat_no.clone(),

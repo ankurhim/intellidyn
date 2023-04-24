@@ -10,97 +10,93 @@ use axum::{
 
 use serde_json::{Value, json};
 
+use crate::routes::incoming_steel::incoming_steel_model::IncomingSteel;
 use crate::routes::users::user_model::User;
 use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FindUserRequest {
-    pub username: Option<String>,
-    pub password: Option<String>
+pub struct FindIncomingSteelRequest {
+    pub heat_no: Option<String>
 }
 
 #[derive(Debug, Serialize)]
-pub struct FindUserResponse {
-    pub success: bool,
-    pub data: Vec<User>,
-    pub error: Option<String>
+pub struct FindIncomingSteelResponse {
+    pub data: Vec<IncomingSteel>
 }
 
-impl FindUserRequest {
-    pub async fn find_users(
+impl FindIncomingSteelRequest {
+    pub async fn find_incoming_steels(
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
-        let mut user_vector: Vec<User> = Vec::new();
+        let mut steel_vector: Vec<IncomingSteel> = Vec::new();
 
         let resp = service.client
         .query(
-            "SELECT * FROM intellidyn_user", &[]
+            "SELECT * FROM intellidyn_incoming_material", &[]
         )
         .await
-        .map_err(|e| Json(json!(FindUserResponse {
-            success: false,
-            data: vec![],
-            error: Some(e.to_string())
+        .map_err(|e| Json(json!(FindIncomingSteelResponse {
+            data: vec![]
         })));
 
         for row in resp.unwrap() {
-            user_vector.push(User {
-                user_pk: Uuid::parse_str(row.get(1)).unwrap(),
-                full_name: row.get(2),
-                username: row.get(3),
-                password: row.get(4),
-                phone_no: row.get(5),
-                created_by: row.get(6),
-                created_on: row.get(7),
-                modified_by: row.get(8),
-                modified_on: row.get(9)
+            steel_vector.push(IncomingSteel {
+                incoming_pk: Uuid::parse_str(row.get(1)).unwrap(),
+                challan_no: row.get(2),
+                challan_date: row.get(3),
+                grade: row.get(4),
+                section: row.get(5),
+                heat_no: row.get(6),
+                heat_code: row.get(7),
+                jominy_value: row.get(8),
+                received_qty: row.get(9),
+                created_by: row.get(10),
+                created_on: row.get(11),
+                modified_by: row.get(12),
+                modified_on: row.get(13)
             })
         }
 
-        Json(json!(FindUserResponse {
-            success: true,
-            data: user_vector,
-            error: None,
-        }))
+        Json(json!(steel_vector))
     }
 
-    pub async fn find_user_by_username(
+    pub async fn find_incoming_steels_by_heat_no(
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
-        Query(query): Query<FindUserRequest>,
+        Query(query): Query<FindIncomingSteelRequest>,
     ) -> Json<Value> {
-        let mut user_vector: Vec<User> = Vec::new();
+        let mut steel_vector: Vec<IncomingSteel> = Vec::new();
 
         let resp = service.client
         .query(
-            "SELECT * FROM intellidyn_user WHERE username = $1", &[&query.username]
+            "SELECT * FROM intellidyn_incoming_material WHERE heat_no = $1", &[&query.heat_no]
         )
         .await
-        .map_err(|e| Json(json!(FindUserResponse {
-            success: false,
+        .map_err(|e| Json(json!(FindIncomingSteelResponse {
             data: vec![],
-            error: Some(e.to_string())
         })));
 
         for row in resp.unwrap() {
-            user_vector.push(User {
-                user_pk: Uuid::parse_str(row.get(1)).unwrap(),
-                full_name: row.get(2),
-                username: row.get(3),
-                password: row.get(4),
-                phone_no: row.get(5),
-                created_by: row.get(6),
-                created_on: row.get(7),
-                modified_by: row.get(8),
-                modified_on: row.get(9)
+            steel_vector.push(IncomingSteel {
+                incoming_pk: Uuid::parse_str(row.get(1)).unwrap(),
+                challan_no: row.get(2),
+                challan_date: row.get(3),
+                grade: row.get(4),
+                section: row.get(5),
+                heat_no: row.get(6),
+                heat_code: row.get(7),
+                jominy_value: row.get(8),
+                received_qty: row.get(9),
+                created_by: row.get(10),
+                created_on: row.get(11),
+                modified_by: row.get(12),
+                modified_on: row.get(13)
             })
         }
 
-        Json(json!(FindUserResponse {
-            success: true,
-            data: user_vector,
-            error: None,
+        Json(json!(FindIncomingSteelResponse {
+            data: steel_vector,
         }))
     }
 }
