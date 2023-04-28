@@ -47,14 +47,15 @@ impl FindIncomingSteelRequest {
                 challan_date: row.get(3),
                 grade: row.get(4),
                 section: row.get(5),
-                heat_no: row.get(6),
-                heat_code: row.get(7),
-                jominy_value: row.get(8),
-                received_qty: row.get(9),
-                created_by: row.get(10),
-                created_on: row.get(11),
-                modified_by: row.get(12),
-                modified_on: row.get(13)
+                section_type: row.get(6),
+                heat_no: row.get(7),
+                heat_code: row.get(8),
+                jominy_value: row.get(9),
+                received_qty: row.get(10),
+                created_by: row.get(11),
+                created_on: row.get(12),
+                modified_by: row.get(13),
+                modified_on: row.get(14)
             })
         }
 
@@ -84,14 +85,15 @@ impl FindIncomingSteelRequest {
                 challan_date: row.get(3),
                 grade: row.get(4),
                 section: row.get(5),
-                heat_no: row.get(6),
-                heat_code: row.get(7),
-                jominy_value: row.get(8),
-                received_qty: row.get(9),
-                created_by: row.get(10),
-                created_on: row.get(11),
-                modified_by: row.get(12),
-                modified_on: row.get(13)
+                section_type: row.get(6),
+                heat_no: row.get(7),
+                heat_code: row.get(8),
+                jominy_value: row.get(9),
+                received_qty: row.get(10),
+                created_by: row.get(11),
+                created_on: row.get(12),
+                modified_by: row.get(13),
+                modified_on: row.get(14)
             })
         }
 

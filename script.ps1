@@ -1,2 +1,2 @@
-cd F:\rust_projects\intellidyn
-cargo run
+cd D:\rust_projects\intellidyn
+cargo watch -x run

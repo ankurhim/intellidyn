@@ -18,7 +18,8 @@ pub struct CreateIncomingSteelRequest {
     pub challan_no: String,
     pub challan_date: String,
     pub grade: String,
-    pub section: String,
+    pub section: i64,
+    pub section_type: String,
     pub heat_no: String,
     pub heat_code: Option<String>,
     pub jominy_value: Option<String>,
@@ -41,13 +42,14 @@ impl CreateIncomingSteelRequest {
         
         let _create_table = service.client
         .execute(
-            "CREATE TABLE IF NOT EXISTS intellidyn_incoming_material (
+            "CREATE TABLE IF NOT EXISTS intellidyn_incoming_steel_table (
                 id SERIAL NOT NULL,
                 incoming_pk TEXT NOT NULL,
                 challan_no TEXT NOT NULL,
                 challan_date DATE NOT NULL,
                 grade TEXT NOT NULL,
-                section TEXT NOT NULL,
+                section INT NOT NULL,
+                section_type TEXT NOT NULL,
                 heat_no TEXT NOT NULL,
                 heat_code TEXT,
                 jominy_value TEXT,
@@ -74,6 +76,7 @@ impl CreateIncomingSteelRequest {
             challan_date: Date::parse(&payload.challan_date, date_format).unwrap(),
             grade: payload.grade.clone(),
             section: payload.section.clone(),
+            section_type: payload.section_type.clone(),
             heat_no: payload.heat_no.clone(),
             heat_code: payload.heat_code.clone(),
             jominy_value: payload.jominy_value.clone(),
@@ -86,12 +89,13 @@ impl CreateIncomingSteelRequest {
 
         let resp = service.client
         .execute(
-            "INSERT INTO intellidyn_incoming_material (
+            "INSERT INTO intellidyn_incoming_steel_table (
                 incoming_pk,
                 challan_no,
                 challan_date,
                 grade,
                 section,
+                section_type,
                 heat_no,
                 heat_code,
                 jominy_value,
@@ -113,13 +117,15 @@ impl CreateIncomingSteelRequest {
                 $10,
                 $11,
                 $12,
-                $13
+                $13,
+                $14
             )", &[
                 &new_incoming_steel.incoming_pk.to_string(),
                 &new_incoming_steel.challan_no,
                 &new_incoming_steel.challan_date,
                 &new_incoming_steel.grade,
                 &new_incoming_steel.section,
+                &new_incoming_steel.section_type,
                 &new_incoming_steel.heat_no,
                 match &new_incoming_steel.heat_code {
                     Some(v) => v,
