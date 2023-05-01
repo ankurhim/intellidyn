@@ -10,22 +10,22 @@ use axum::{
 
 use serde_json::{Value, json};
 
-use crate::routes::incoming_steel::incoming_steel_model::IncomingSteel;
+use crate::routes::approved_components::approved_components_model::ApprovedComponent;
 use crate::routes::users::user_model::User;
 use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FindIncomingSteelRequest {
+pub struct FindApprovedHeatsRequest {
     pub heat_no: Option<String>
 }
 
 #[derive(Debug, Serialize)]
-pub struct FindIncomingSteelResponse {
-    pub data: Vec<IncomingSteel>
+pub struct FindApprovedHeatsResponse {
+    pub data: Vec<ApprovedComponent>
 }
 
-impl FindIncomingSteelRequest {
-    pub async fn find_incoming_steels(
+impl FindApprovedHeatsRequest {
+    pub async fn find_approved_heats(
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
@@ -36,7 +36,7 @@ impl FindIncomingSteelRequest {
             "SELECT * FROM intellidyn_incoming_steel_table", &[]
         )
         .await
-        .map_err(|e| Json(json!(FindIncomingSteelResponse {
+        .map_err(|e| Json(json!(FindApprovedHeatsResponse {
             data: vec![]
         })));
 
@@ -65,7 +65,7 @@ impl FindIncomingSteelRequest {
     pub async fn find_incoming_steels_by_heat_no(
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
-        Query(query): Query<FindIncomingSteelRequest>,
+        Query(query): Query<FindApprovedHeatsRequest>,
     ) -> Json<Value> {
         let mut steel_vector: Vec<IncomingSteel> = Vec::new();
 
@@ -74,7 +74,7 @@ impl FindIncomingSteelRequest {
             "SELECT * FROM intellidyn_incoming_steel_table WHERE heat_no = $1", &[&query.heat_no]
         )
         .await
-        .map_err(|e| Json(json!(FindIncomingSteelResponse {
+        .map_err(|e| Json(json!(FindApprovedHeatsResponse {
             data: vec![],
         })));
 
@@ -97,7 +97,7 @@ impl FindIncomingSteelRequest {
             })
         }
 
-        Json(json!(FindIncomingSteelResponse {
+        Json(json!(FindApprovedHeatsResponse {
             data: steel_vector,
         }))
     }

@@ -68,7 +68,7 @@ impl CreateIncomingSteelRequest {
             error: Some(e.to_string())
         })));
 
-        let date_format = format_description!("[day]-[month]-[year]");
+        let date_format = format_description!("[day].[month].[year]");
 
         let new_incoming_steel = IncomingSteel {
             incoming_pk: Uuid::new_v4(),
