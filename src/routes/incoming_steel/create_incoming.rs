@@ -12,6 +12,7 @@ use serde_json::{Value, json};
 use crate::routes::incoming_steel::IncomingSteel;
 use crate::routes::User;
 use crate::service::DbService;
+use crate::error::AppError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateIncomingSteelRequest {
@@ -38,7 +39,7 @@ impl CreateIncomingSteelRequest {
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<Self>,
-    ) -> Json<Value> {
+    ) -> Result<Json<Value>, AppError> {
         
         let _create_table = service.client
         .execute(
@@ -62,11 +63,10 @@ impl CreateIncomingSteelRequest {
             );", &[]
         ).
         await
-        .map_err(|e| Json(json!(CreateIncomingSteelResponse {
-            success: false,
-            data: None,
-            error: Some(e.to_string())
-        })));
+        .map_err(|e|{
+            dbg!(e);
+            AppError::InternalServerError
+        })?;
 
         let date_format = format_description!("[day].[month].[year]");
 
@@ -87,7 +87,7 @@ impl CreateIncomingSteelRequest {
             modified_on: None,
         };
 
-        let resp = service.client
+        let result = service.client
         .execute(
             "INSERT INTO intellidyn_incoming_steel_table (
                 incoming_pk,
@@ -149,20 +149,16 @@ impl CreateIncomingSteelRequest {
             ]
         )
         .await
-        .map(|val| Json(json!(CreateIncomingSteelResponse {
-            success: true,
-            data: Some(format!("{:?}", val)),
-            error: None
-        })))
-        .map_err(|e| Json(json!(CreateIncomingSteelResponse {
-            success: false,
-            data: None,
-            error: Some(e.to_string())
-        })));
+        .map_err(|_| AppError::InternalServerError)?;
 
-        match resp {
-            Ok(v) => v,
-            Err(e) => e
+        if result < 1 {
+            Err(AppError::InternalServerError)
+        } else {
+            Ok(Json(json!(CreateIncomingSteelResponse {
+                success: true,
+                data: Some("Steel saved successfully!".to_string()),
+                error: None
+            })))
         }
     }
 }

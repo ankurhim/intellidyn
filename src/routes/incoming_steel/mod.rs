@@ -21,7 +21,7 @@ pub async fn create_incoming_routes() -> Router {
     Router::new()
     .route("/create_new_incoming_steel", post(CreateIncomingSteelRequest::create_new_incoming_steel))
     .route("/find_incoming_steels", get(FindIncomingSteelRequest::find_incoming_steels))
-    .route("/find_incoming_steels_by_heat_no", get(FindIncomingSteelRequest::find_incoming_steels_by_heat_no))
+    .route("/find_incoming_steels_by_filter", get(FindIncomingSteelRequest::find_incoming_steels_by_filter))
     // .route("/delete_user_by_username", delete(DeleteUserRequest::delete_user_by_username))
     // .route("/update_user_by_username", put(UpdateUserRequest::update_user_by_username))
 }

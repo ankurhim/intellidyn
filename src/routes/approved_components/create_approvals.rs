@@ -12,6 +12,7 @@ use serde_json::{Value, json};
 use crate::routes::approved_components::ApprovedComponent;
 use crate::routes::User;
 use crate::service::DbService;
+use crate::error::AppError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateApprovedComponentRequest {
@@ -31,10 +32,10 @@ impl CreateApprovedComponentRequest {
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<Self>,
-    ) -> Json<Value> {
-
-        let mut result: Json<Value> = Json(json!("".to_string()));
+    ) -> Result<Json<Value>, AppError> {
         
+        let mut result = Ok(Json(json!("".to_string())));
+
         let _create_table = service.client
         .execute(
             "CREATE TABLE IF NOT EXISTS intellidyn_approved_component_table (
@@ -50,11 +51,10 @@ impl CreateApprovedComponentRequest {
             );", &[]
         ).
         await
-        .map_err(|e| Json(json!(CreateApprovedComponentResponse {
-            success: false,
-            data: None,
-            error: Some(e.to_string())
-        })));
+        .map_err(|e|{
+            dbg!(e);
+            AppError::InternalServerError
+        })?;
 
         let row: i64 = service.client
         .query(
@@ -62,12 +62,10 @@ impl CreateApprovedComponentRequest {
             &[&payload.heat_no]
         )
         .await
-        .map_err(|e| Json(json!(CreateApprovedComponentResponse {
-            success: false,
-            data: None,
-            error: Some(e.to_string())
-        })))
-        .unwrap()[0].get(0);
+        .map_err(|e|{
+            dbg!(e);
+            AppError::InternalServerError
+        })?[0].get(0);
 
         if &payload.part_list.len() > &0 && row > 0 {
             for part in &payload.part_list {
@@ -81,7 +79,7 @@ impl CreateApprovedComponentRequest {
                     modified_on: None,
                 };
         
-                result = service.client
+                let resp = service.client
                 .execute(
                     "INSERT INTO intellidyn_approved_component_table (
                         approval_pk,
@@ -116,19 +114,19 @@ impl CreateApprovedComponentRequest {
                     ]
                 )
                 .await
-                .map(|val| Json(json!(CreateApprovedComponentResponse {
-                    success: true,
-                    data: Some(format!("{:?}", val)),
-                    error: None
-                })))
-                .map_err(|e| Json(json!(CreateApprovedComponentResponse {
-                    success: false,
-                    data: None,
-                    error: Some(e.to_string())
-                }))).unwrap();
+                .map_err(|_| AppError::InternalServerError)?;
+        
+                result = if resp < 1 {
+                    Err(AppError::InternalServerError)
+                } else {
+                    Ok(Json(json!(CreateApprovedComponentResponse {
+                        success: true,
+                        data: Some("Approval saved successfully!".to_string()),
+                        error: None
+                    })))
+                };
             }
-        };
-
+        }
         result
     }
 }

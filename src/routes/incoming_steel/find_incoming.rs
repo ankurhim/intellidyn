@@ -13,10 +13,11 @@ use serde_json::{Value, json};
 use crate::routes::incoming_steel::incoming_steel_model::IncomingSteel;
 use crate::routes::users::user_model::User;
 use crate::service::DbService;
+use crate::error::AppError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FindIncomingSteelRequest {
-    pub heat_no: Option<String>
+    pub filter: Option<String>
 }
 
 #[derive(Debug, Serialize)]
@@ -28,7 +29,7 @@ impl FindIncomingSteelRequest {
     pub async fn find_incoming_steels(
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
-    ) -> Json<Value> {
+    ) -> Result<Json<Value>, AppError> {
         let mut steel_vector: Vec<IncomingSteel> = Vec::new();
 
         let resp = service.client
@@ -36,11 +37,12 @@ impl FindIncomingSteelRequest {
             "SELECT * FROM intellidyn_incoming_steel_table", &[]
         )
         .await
-        .map_err(|e| Json(json!(FindIncomingSteelResponse {
-            data: vec![]
-        })));
+        .map_err(|e|{
+            dbg!(e);
+            AppError::InternalServerError
+        })?;
 
-        for row in resp.unwrap() {
+        for row in resp {
             steel_vector.push(IncomingSteel {
                 incoming_pk: Uuid::parse_str(row.get(1)).unwrap(),
                 challan_no: row.get(2),
@@ -59,26 +61,27 @@ impl FindIncomingSteelRequest {
             })
         }
 
-        Json(json!(steel_vector))
+        Ok(Json(json!(steel_vector)))
     }
 
-    pub async fn find_incoming_steels_by_heat_no(
+    pub async fn find_incoming_steels_by_filter(
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
         Query(query): Query<FindIncomingSteelRequest>,
-    ) -> Json<Value> {
+    ) -> Result<Json<Value>, AppError> {
         let mut steel_vector: Vec<IncomingSteel> = Vec::new();
 
         let resp = service.client
         .query(
-            "SELECT * FROM intellidyn_incoming_steel_table WHERE heat_no = $1", &[&query.heat_no]
+            "SELECT * FROM intellidyn_incoming_steel_table WHERE challan_no = $1 OR grade = $1 OR heat_no = $1 OR heat_code = $1", &[&query.filter]
         )
         .await
-        .map_err(|e| Json(json!(FindIncomingSteelResponse {
-            data: vec![],
-        })));
+        .map_err(|e|{
+            dbg!(e);
+            AppError::InternalServerError
+        })?;
 
-        for row in resp.unwrap() {
+        for row in resp {
             steel_vector.push(IncomingSteel {
                 incoming_pk: Uuid::parse_str(row.get(1)).unwrap(),
                 challan_no: row.get(2),
@@ -97,8 +100,6 @@ impl FindIncomingSteelRequest {
             })
         }
 
-        Json(json!(FindIncomingSteelResponse {
-            data: steel_vector,
-        }))
+        Ok(Json(json!(steel_vector)))
     }
 }
