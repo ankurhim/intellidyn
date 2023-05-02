@@ -116,24 +116,22 @@ impl FindIncomingSteelRequest {
         let resp = service.client
         .query(
             "SELECT
-                    incoming_pk,
                     grade,
                     section,
                     section_type,
                     heat_no,
                     heat_code,
-                    SUM(actual_qty) AS TotalAvailableQty,
+                    SUM(actual_qty) AS total_available_qty,
                     heat_status
             FROM
                     intellidyn_incoming_steel_table
             WHERE
                     heat_status IS NULL
             GROUP BY
-                    incoming_pk,
-                    heat_no,
                     grade,
                     section,
                     section_type,
+                    heat_no,
                     heat_code,
                     heat_status;
             ", &[]
@@ -145,18 +143,15 @@ impl FindIncomingSteelRequest {
         })?;
 
         for row in resp {
+            println!("{:#?}", &row);
             steel_vector.push(SteelInventory {
-                grade: row.get(1),
-                section: row.get(2),
-                section_type: row.get(3),
-                heat_no: row.get(4),
-                heat_code: row.get(5),
-                total_available_qty: row.get(6),
-                heat_status: row.get(7),
-                created_by: row.get(8),
-                created_on: row.get(9),
-                modified_by: row.get(10),
-                modified_on: row.get(11)
+                grade: row.get(0),
+                section: row.get(1),
+                section_type: row.get(2),
+                heat_no: row.get(3),
+                heat_code: row.get(4),
+                total_available_qty: row.get(5),
+                heat_status: row.get(6)
             })
         }
 
@@ -172,7 +167,30 @@ impl FindIncomingSteelRequest {
 
         let resp = service.client
         .query(
-            "SELECT DISTINCT ON (heat_no) heat_no,  grade, section, section_type, heat_code, SUM(actual_qty) AS TotalAvailableQty FROM intellidyn_incoming_steel_table WHERE challan_no = $1 OR grade = $1 OR heat_no = $1 OR heat_code = $1 AND heat_status IS NULL GROUP BY heat_no ORDER BY heat_no", &[&query.filter]
+            "SELECT
+                    grade,
+                    section,
+                    section_type,
+                    heat_no,
+                    heat_code,
+                    SUM(actual_qty) AS total_available_qty,
+                    heat_status
+            FROM
+                    intellidyn_incoming_steel_table
+            WHERE
+                    challan_no = $1 OR
+                    grade = $1 OR 
+                    heat_no = $1 OR 
+                    heat_code = $1 AND
+                    heat_status IS NULL
+            GROUP BY
+                    grade,
+                    section,
+                    section_type,
+                    heat_no,
+                    heat_code,
+                    heat_status;",
+            &[&query.filter]
         )
         .await
         .map_err(|e|{
@@ -188,11 +206,7 @@ impl FindIncomingSteelRequest {
                 heat_no: row.get(4),
                 heat_code: row.get(5),
                 total_available_qty: row.get(6),
-                heat_status: row.get(7),
-                created_by: row.get(8),
-                created_on: row.get(9),
-                modified_by: row.get(10),
-                modified_on: row.get(11)
+                heat_status: row.get(7)
             })
         }
 

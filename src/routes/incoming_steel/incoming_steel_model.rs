@@ -52,10 +52,6 @@ pub struct SteelInventory {
     pub section_type: String,
     pub heat_no: String,
     pub heat_code: Option<String>,
-    pub total_available_qty: i64,
-    pub heat_status: Option<String>,
-    pub created_by: Option<String>,
-    pub created_on: std::time::SystemTime,
-    pub modified_by: Option<String>,
-    pub modified_on: Option<std::time::SystemTime>
+    pub total_available_qty: String,
+    pub heat_status: Option<String>
 }
