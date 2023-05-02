@@ -121,7 +121,7 @@ impl FindIncomingSteelRequest {
                     section_type,
                     heat_no,
                     heat_code,
-                    SUM(actual_qty) AS total_available_qty,
+                    SUM(actual_qty) :: BIGINT AS total_available_qty,
                     heat_status
             FROM
                     intellidyn_incoming_steel_table
@@ -143,7 +143,6 @@ impl FindIncomingSteelRequest {
         })?;
 
         for row in resp {
-            println!("{:#?}", &row);
             steel_vector.push(SteelInventory {
                 grade: row.get(0),
                 section: row.get(1),
@@ -173,7 +172,7 @@ impl FindIncomingSteelRequest {
                     section_type,
                     heat_no,
                     heat_code,
-                    SUM(actual_qty) AS total_available_qty,
+                    SUM(actual_qty) :: BIGINT AS total_available_qty,
                     heat_status
             FROM
                     intellidyn_incoming_steel_table
@@ -200,13 +199,13 @@ impl FindIncomingSteelRequest {
 
         for row in resp {
             steel_vector.push(SteelInventory {
-                grade: row.get(1),
-                section: row.get(2),
-                section_type: row.get(3),
-                heat_no: row.get(4),
-                heat_code: row.get(5),
-                total_available_qty: row.get(6),
-                heat_status: row.get(7)
+                grade: row.get(0),
+                section: row.get(1),
+                section_type: row.get(2),
+                heat_no: row.get(3),
+                heat_code: row.get(4),
+                total_available_qty: row.get(5),
+                heat_status: row.get(6)
             })
         }
 

@@ -52,6 +52,6 @@ pub struct SteelInventory {
     pub section_type: String,
     pub heat_no: String,
     pub heat_code: Option<String>,
-    pub total_available_qty: String,
+    pub total_available_qty: i64,
     pub heat_status: Option<String>
 }
