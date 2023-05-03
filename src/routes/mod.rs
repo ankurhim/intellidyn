@@ -16,6 +16,7 @@ use crate::routes::auth::create_auth_routes;
 use crate::routes::users::user_model::User;
 use crate::routes::incoming_steel::create_incoming_routes;
 use crate::routes::approved_components::create_approved_component_routes;
+use crate::routes::cutting_production::create_steel_request_routes;
 
 
 pub async fn create_routes() -> Router {
@@ -30,6 +31,7 @@ pub async fn create_routes() -> Router {
     .nest("/auth/", create_auth_routes().await)
     .nest("/incoming_steels/", create_incoming_routes().await)
     .nest("/approved_components/", create_approved_component_routes().await)
+    .nest("/cutting_production", create_steel_request_routes().await)
     .layer(Extension(logged_user))
     .layer(Extension(client));
 

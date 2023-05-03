@@ -6,6 +6,7 @@ use axum::{
     Extension,
     Json,
 };
+use std::collections::HashMap;
 
 use serde_json::{Value, json};
 
@@ -16,8 +17,7 @@ use crate::error::AppError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateSteelRequisitionRequest {
-    pub part_no: String,
-    pub cutting_quantity: i64,
+    pub part_no_qty_pair: HashMap<String, i64>
 }
 
 #[derive(Debug, Serialize)]
@@ -54,69 +54,71 @@ impl CreateSteelRequisitionRequest {
             AppError::TableCreationFailed
         });
 
-        let result = if !create_table.is_err() {
+        let mut counter = 0;
 
-            let new_request = SteelRequisition {
-                request_pk: Uuid::new_v4(),
-                part_no: payload.part_no,
-                cutting_quantity: payload.cutting_quantity,
-                created_by: Some(logged_user.username.to_string()),
-                created_on: std::time::SystemTime::now(),
-                modified_by: None,
-                modified_on: None
-            };
+        if !create_table.is_err() {
 
-            let insert_result = service.client
-            .execute(
-                "INSERT INTO intellidyn_steel_requisition_table (
-                    request_pk,
-                    part_no,
-                    cutting_qty,
-                    created_by,
-                    created_on,
-                    modified_by,
-                    modified_on
-                ) VALUES (
-                    $1,
-                    $2,
-                    $3,
-                    $4,
-                    $5,
-                    $6,
-                    $7
-                );",
-                &[
-                    &new_request.request_pk.clone(),
-                    &new_request.part_no,
-                    &new_request.cutting_quantity,
-                    match &new_request.created_by {
-                        Some(v) => v,
-                        _ => &None::<String>
-                    },
-                    &new_request.created_on,
-                    match &new_request.modified_by {
-                        Some(v) => v,
-                        _ => &None::<String>
-                    },
-                    &new_request.modified_on
-                ]
-            )
-            .await
-            .map_err(|e| {
-                dbg!(e);
-                AppError::DataInsertionFailed
-            })?;
+            for (key, value) in payload.part_no_qty_pair.iter() {
+                let new_request = SteelRequisition {
+                    request_pk: Uuid::new_v4(),
+                    part_no: key.to_string(),
+                    cutting_quantity: *value,
+                    created_by: Some(logged_user.username.to_string()),
+                    created_on: std::time::SystemTime::now(),
+                    modified_by: None,
+                    modified_on: None
+                };
 
-            if insert_result < 1 {
-                Err(AppError::DataInsertionFailed)
-            } else {
-                Ok(Json(json!(insert_result)))
+                let insert_result = service.client
+                .execute(
+                    "INSERT INTO intellidyn_steel_requisition_table (
+                        request_pk,
+                        part_no,
+                        cutting_qty,
+                        created_by,
+                        created_on,
+                        modified_by,
+                        modified_on
+                    ) VALUES (
+                        $1,
+                        $2,
+                        $3,
+                        $4,
+                        $5,
+                        $6,
+                        $7
+                    );",
+                    &[
+                        &new_request.request_pk.clone(),
+                        &new_request.part_no,
+                        &new_request.cutting_quantity,
+                        match &new_request.created_by {
+                            Some(v) => v,
+                            _ => &None::<String>
+                        },
+                        &new_request.created_on,
+                        match &new_request.modified_by {
+                            Some(v) => v,
+                            _ => &None::<String>
+                        },
+                        &new_request.modified_on
+                    ]
+                )
+                .await
+                .map_err(|e| {
+                    dbg!(e);
+                    AppError::DataInsertionFailed
+                })?;
+
+                if insert_result < 1 {
+                    return Err(AppError::DataInsertionFailed);
+                } else {
+                    counter += 1;
+                };
             }
-        } else {
-            Err(AppError::TableDoesNotExist)
         };
 
-        result
+        Ok(Json(json!(counter)))
     }
 
     pub async fn drop_steel_request_table(
