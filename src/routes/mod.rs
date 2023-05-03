@@ -2,6 +2,7 @@ pub mod users;
 pub mod auth;
 pub mod incoming_steel;
 pub mod approved_components;
+pub mod cutting_production;
 
 use axum::{
     Router,

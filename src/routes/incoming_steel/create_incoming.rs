@@ -55,6 +55,7 @@ impl CreateIncomingSteelRequest {
                 heat_code TEXT,
                 jominy_value TEXT,
                 received_qty BIGINT NOT NULL,
+                issued_qty BIGINT NOT NULL,
                 actual_qty BIGINT NOT NULL,
                 heat_status TEXT,
                 created_by TEXT NOT NULL,
@@ -84,7 +85,8 @@ impl CreateIncomingSteelRequest {
                 heat_code: payload.heat_code.clone(),
                 jominy_value: payload.jominy_value.clone(),
                 received_qty: payload.received_qty.clone(),
-                actual_qty: payload.received_qty.clone(),
+                issued_qty: 0,
+                actual_qty: payload.received_qty.clone() - 0,
                 heat_status: None,
                 created_by: Some(logged_user.username.to_string()),
                 created_on: std::time::SystemTime::now(),
@@ -105,6 +107,7 @@ impl CreateIncomingSteelRequest {
                     heat_code,
                     jominy_value,
                     received_qty,
+                    issued_qty,
                     actual_qty,
                     heat_status,
                     created_by,
@@ -127,7 +130,8 @@ impl CreateIncomingSteelRequest {
                     $13,
                     $14,
                     $15,
-                    $16
+                    $16,
+                    $17
                 )", &[
                     &new_incoming_steel.incoming_pk.to_string(),
                     &new_incoming_steel.challan_no,
@@ -145,6 +149,7 @@ impl CreateIncomingSteelRequest {
                         _ => &None::<String>
                     },
                     &new_incoming_steel.received_qty,
+                    &new_incoming_steel.issued_qty,
                     &new_incoming_steel.actual_qty,
                     match &new_incoming_steel.heat_status {
                         Some(v) => v,
@@ -175,5 +180,20 @@ impl CreateIncomingSteelRequest {
         };
 
         result
+    }
+
+    pub async fn drop_steel_incoming_table(
+        Extension(logged_user): Extension<Arc<User>>,
+        Extension(service): Extension<Arc<DbService>>,
+    ) -> Result<Json<Value>, AppError> {
+        let result = service.client
+        .execute("DROP TABLE IF EXISTS intellidyn_incoming_steel_table;", &[])
+        .await
+        .map_err(|e| {
+            dbg!(e);
+            AppError::InternalServerError
+        });
+
+        Ok(Json(json!(result)))
     }
 }

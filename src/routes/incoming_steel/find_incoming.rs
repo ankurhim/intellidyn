@@ -54,12 +54,13 @@ impl FindIncomingSteelRequest {
                 heat_code: row.get(8),
                 jominy_value: row.get(9),
                 received_qty: row.get(10),
-                actual_qty: row.get(11),
-                heat_status: row.get(12),
-                created_by: row.get(13),
-                created_on: row.get(14),
-                modified_by: row.get(15),
-                modified_on: row.get(16)
+                issued_qty: row.get(11),
+                actual_qty: row.get(12),
+                heat_status: row.get(13),
+                created_by: row.get(14),
+                created_on: row.get(15),
+                modified_by: row.get(16),
+                modified_on: row.get(17)
             })
         }
 
@@ -95,12 +96,13 @@ impl FindIncomingSteelRequest {
                 heat_code: row.get(8),
                 jominy_value: row.get(9),
                 received_qty: row.get(10),
-                actual_qty: row.get(11),
-                heat_status: row.get(12),
-                created_by: row.get(13),
-                created_on: row.get(14),
-                modified_by: row.get(15),
-                modified_on: row.get(16)
+                issued_qty: row.get(11),
+                actual_qty: row.get(12),
+                heat_status: row.get(13),
+                created_by: row.get(14),
+                created_on: row.get(15),
+                modified_by: row.get(16),
+                modified_on: row.get(17)
             })
         }
 
@@ -116,25 +118,27 @@ impl FindIncomingSteelRequest {
         let resp = service.client
         .query(
             "SELECT
+                    heat_no,
                     grade,
                     section,
                     section_type,
-                    heat_no,
                     heat_code,
-                    SUM(actual_qty) :: BIGINT AS total_available_qty,
+                    SUM(received_qty) :: BIGINT AS total_received_qty,
+                    SUM(issued_qty) :: BIGINT AS total_issued_qty,
+                    SUM(received_qty - issued_qty) :: BIGINT AS total_available_qty,
                     heat_status
             FROM
                     intellidyn_incoming_steel_table
             WHERE
                     heat_status IS NULL
             GROUP BY
+                    heat_no,
                     grade,
                     section,
                     section_type,
-                    heat_no,
                     heat_code,
-                    heat_status;
-            ", &[]
+                    heat_status;",
+            &[]
         )
         .await
         .map_err(|e|{
@@ -144,13 +148,15 @@ impl FindIncomingSteelRequest {
 
         for row in resp {
             steel_vector.push(SteelInventory {
-                grade: row.get(0),
-                section: row.get(1),
-                section_type: row.get(2),
-                heat_no: row.get(3),
+                heat_no: row.get(0),
+                grade: row.get(1),
+                section: row.get(2),
+                section_type: row.get(3),
                 heat_code: row.get(4),
-                total_available_qty: row.get(5),
-                heat_status: row.get(6)
+                total_received_qty: row.get(5),
+                total_issued_qty: row.get(6),
+                total_available_qty: row.get(7),
+                heat_status: row.get(8)
             })
         }
 
@@ -167,12 +173,14 @@ impl FindIncomingSteelRequest {
         let resp = service.client
         .query(
             "SELECT
+                    heat_no,
                     grade,
                     section,
                     section_type,
-                    heat_no,
                     heat_code,
-                    SUM(actual_qty) :: BIGINT AS total_available_qty,
+                    SUM(received_qty) :: BIGINT AS total_received_qty,
+                    SUM(issued_qty) :: BIGINT AS total_issued_qty,
+                    SUM(received_qty - issued_qty) :: BIGINT AS total_available_qty,
                     heat_status
             FROM
                     intellidyn_incoming_steel_table
@@ -183,10 +191,10 @@ impl FindIncomingSteelRequest {
                     heat_code = $1 AND
                     heat_status IS NULL
             GROUP BY
+                    heat_no,
                     grade,
                     section,
                     section_type,
-                    heat_no,
                     heat_code,
                     heat_status;",
             &[&query.filter]
@@ -199,13 +207,15 @@ impl FindIncomingSteelRequest {
 
         for row in resp {
             steel_vector.push(SteelInventory {
-                grade: row.get(0),
-                section: row.get(1),
-                section_type: row.get(2),
-                heat_no: row.get(3),
+                heat_no: row.get(0),
+                grade: row.get(1),
+                section: row.get(2),
+                section_type: row.get(3),
                 heat_code: row.get(4),
-                total_available_qty: row.get(5),
-                heat_status: row.get(6)
+                total_received_qty: row.get(5),
+                total_issued_qty: row.get(6),
+                total_available_qty: row.get(7),
+                heat_status: row.get(8)
             })
         }
 
