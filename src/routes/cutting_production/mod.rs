@@ -7,7 +7,6 @@ use axum::{
 };
 
 use self::{
-    cutting_request_model::SteelRequisition,
     create_request::CreateSteelRequisitionRequest,
 };
 

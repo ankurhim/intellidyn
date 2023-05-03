@@ -72,7 +72,7 @@ impl CreateIncomingSteelRequest {
         });
 
         let result = if !_create_table.is_err() {
-            let date_format = format_description!("[day].[month].[year]");
+            let date_format = format_description!("[day]-[month]-[year]");
 
             let new_incoming_steel = IncomingSteel {
                 incoming_pk: Uuid::new_v4(),
@@ -168,7 +168,10 @@ impl CreateIncomingSteelRequest {
                 ]
             )
             .await
-            .map_err(|_| AppError::DataInsertionFailed)?;
+            .map_err(|e| {
+                dbg!(e);
+                AppError::DataInsertionFailed
+            })?;
 
             if insert_result < 1 {
                 Err(AppError::DataInsertionFailed)
