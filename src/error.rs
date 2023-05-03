@@ -9,8 +9,9 @@ use serde_json::json;
 #[derive(Debug, Serialize)]
 pub enum AppError {
     InternalServerError,
-    ObjectAlreadyExists,
-    ObjectDoesNotExists
+    TableDoesNotExist,
+    TableCreationFailed,
+    DataInsertionFailed,
 }
 
 impl IntoResponse for AppError {
@@ -20,8 +21,9 @@ impl IntoResponse for AppError {
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "an internal server error occurred"
             ),
-            Self::ObjectAlreadyExists => (StatusCode::BAD_REQUEST, "Object already exists"),
-            Self::ObjectDoesNotExists => (StatusCode::BAD_REQUEST, "Object does not exist")
+            Self::TableDoesNotExist => (StatusCode::BAD_REQUEST, "Table does not exist"),
+            Self::TableCreationFailed => (StatusCode::BAD_REQUEST, "Table creation failed"),
+            Self::DataInsertionFailed => (StatusCode::INTERNAL_SERVER_ERROR, "Data insertion failed")
         };
 
         (status, Json(json!({"error": err_msg}))).into_response()

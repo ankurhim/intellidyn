@@ -22,29 +22,6 @@ pub struct IncomingSteel {
     pub modified_on: Option<std::time::SystemTime>
 }
 
-impl IncomingSteel {
-    pub fn default() -> Self {
-        IncomingSteel {
-            incoming_pk: Uuid::new_v4(),
-            challan_no: "".to_string(),
-            challan_date: Date::MIN,
-            grade: "".to_string(),
-            section: 0,
-            section_type: "DIA".to_string(),
-            heat_no: "".to_string(),
-            heat_code: None,
-            jominy_value: None,
-            received_qty: 0,
-            actual_qty: 0,
-            heat_status: None,
-            created_by: None,
-            created_on: std::time::SystemTime::now(),
-            modified_by: None,
-            modified_on: None
-        }
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SteelInventory {
     pub grade: String,

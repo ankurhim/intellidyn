@@ -67,7 +67,7 @@ impl CreateIncomingSteelRequest {
         .await
         .map_err(|e| {
             dbg!(e);
-            AppError::InternalServerError
+            AppError::TableCreationFailed
         });
 
         let result = if !_create_table.is_err() {
@@ -163,15 +163,15 @@ impl CreateIncomingSteelRequest {
                 ]
             )
             .await
-            .map_err(|_| AppError::InternalServerError)?;
+            .map_err(|_| AppError::DataInsertionFailed)?;
 
             if insert_result < 1 {
-                Err(AppError::InternalServerError)
+                Err(AppError::DataInsertionFailed)
             } else {
                 Ok(Json(json!(insert_result)))
             }
         } else {
-            Err(AppError::InternalServerError)
+            Err(AppError::TableDoesNotExist)
         };
 
         result

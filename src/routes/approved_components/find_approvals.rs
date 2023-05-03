@@ -46,13 +46,14 @@ impl FindApprovedHeatsRequest {
             part_vector.push(ApprovedComponent {
                 approval_pk: Uuid::parse_str(row.get(1)).unwrap(),
                 heat_no: row.get(2),
-                section: row.get(3),
-                section_type: row.get(4),
-                approved_part: row.get(5),
-                created_by: row.get(6),
-                created_on: row.get(7),
-                modified_by: row.get(8),
-                modified_on: row.get(9)
+                grade: row.get(3),
+                section: row.get(4),
+                section_type: row.get(5),
+                approved_part: row.get(6),
+                created_by: row.get(7),
+                created_on: row.get(8),
+                modified_by: row.get(9),
+                modified_on: row.get(10)
             })
         }
 
@@ -80,13 +81,14 @@ impl FindApprovedHeatsRequest {
             part_vector.push(ApprovedComponent {
                 approval_pk: Uuid::parse_str(row.get(1)).unwrap(),
                 heat_no: row.get(2),
-                section: row.get(3),
-                section_type: row.get(4),
-                approved_part: row.get(5),
-                created_by: row.get(6),
-                created_on: row.get(7),
-                modified_by: row.get(8),
-                modified_on: row.get(9)
+                grade: row.get(3),
+                section: row.get(4),
+                section_type: row.get(5),
+                approved_part: row.get(6),
+                created_by: row.get(7),
+                created_on: row.get(8),
+                modified_by: row.get(9),
+                modified_on: row.get(10)
             })
         }
 
