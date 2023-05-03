@@ -50,7 +50,9 @@ impl FindApprovedHeatsRequest {
                 created_by: row.get(4),
                 created_on: row.get(5),
                 modified_by: row.get(6),
-                modified_on: row.get(7)
+                modified_on: row.get(7),
+                section: row.get(8),
+                section_type: row.get(9)
             })
         }
 
@@ -82,7 +84,9 @@ impl FindApprovedHeatsRequest {
                 created_by: row.get(4),
                 created_on: row.get(5),
                 modified_by: row.get(6),
-                modified_on: row.get(7)
+                modified_on: row.get(7),
+                section: row.get(8),
+                section_type: row.get(9)
             })
         }
 

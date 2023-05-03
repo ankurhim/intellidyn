@@ -17,6 +17,8 @@ use crate::error::AppError;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateApprovedComponentRequest {
     pub heat_no: String,
+    pub section: i64,
+    pub section_type: String,
     pub part_list: Vec<String>,
 }
 
@@ -42,12 +44,14 @@ impl CreateApprovedComponentRequest {
                 id SERIAL NOT NULL,
                 approval_pk TEXT NOT NULL,
                 heat_no TEXT NOT NULL,
+                section INT NOT NULL,
+                section_type TEXT NOT NULL,
                 approved_part TEXT,
                 created_by TEXT NOT NULL,
                 created_on TIMESTAMP NOT NULL,
                 modified_by TEXT,
                 modified_on TIMESTAMP,
-                UNIQUE (challan_no, heat_no, approved_part)
+                UNIQUE (heat_no, approved_part)
             );", &[]
         ).
         await
@@ -72,6 +76,8 @@ impl CreateApprovedComponentRequest {
                 let new_approved_component = ApprovedComponent {
                     approval_pk: Uuid::new_v4(),
                     heat_no: payload.heat_no.clone(),
+                    section: payload.section.clone(),
+                    section_type: payload.section_type.clone(),
                     approved_part: part.to_string(),
                     created_by: Some(logged_user.username.to_string()),
                     created_on: std::time::SystemTime::now(),
@@ -84,6 +90,8 @@ impl CreateApprovedComponentRequest {
                     "INSERT INTO intellidyn_approved_component_table (
                         approval_pk,
                         heat_no,
+                        section,
+                        section_type,
                         approved_part,
                         created_by,
                         created_on,
@@ -96,10 +104,14 @@ impl CreateApprovedComponentRequest {
                         $4,
                         $5,
                         $6,
-                        $7
+                        $7,
+                        $8,
+                        $9
                     )", &[
                         &new_approved_component.approval_pk.to_string(),
                         &new_approved_component.heat_no,
+                        &new_approved_component.section,
+                        &new_approved_component.section_type,
                         &new_approved_component.approved_part,
                         match &new_approved_component.created_by {
                             Some(v) => v,
@@ -128,5 +140,23 @@ impl CreateApprovedComponentRequest {
             }
         }
         result
+    }
+
+    pub async fn alter_approved_component_table(
+        Extension(logged_user): Extension<Arc<User>>,
+        Extension(service): Extension<Arc<DbService>>
+    ) -> Result<Json<Value>, AppError> {
+        let result = service.client
+        .execute("ALTER TABLE intellidyn_approved_component_table
+            ADD COLUMN section INT,
+            ADD COLUMN section_type TEXT;", &[]
+        )
+        .await
+        .map_err(|e|{
+            dbg!(e);
+            AppError::InternalServerError
+        });
+
+        Ok(Json(json!(result)))
     }
 }

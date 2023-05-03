@@ -10,46 +10,40 @@ use axum::{
 
 use serde_json::{Value, json};
 
+use crate::routes::incoming_steel::incoming_steel_model::IncomingSteel;
 use crate::routes::users::user_model::User;
 use crate::service::DbService;
+use crate::error::AppError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DeleteUserRequest {
-    pub username: Option<String>
+pub struct DeleteIncomingSteelRequest {
+    pub challan_no: String,
+    pub heat_no: String
 }
 
 #[derive(Debug, Serialize)]
-pub struct DeleteUserResponse {
+pub struct DeleteIncomingSteelResponse {
     pub success: bool,
     pub data: Option<String>,
     pub error: Option<String>
 }
 
-impl DeleteUserRequest {
-    pub async fn delete_user_by_username(
+impl DeleteIncomingSteelRequest {
+    pub async fn delete_steel_by_filter(
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
-        Query(query): Query<DeleteUserRequest>,
-    ) -> Json<Value> {
+        Query(query): Query<DeleteIncomingSteelRequest>,
+    ) -> Result<Json<Value>, AppError> {
         let resp = service.client
         .execute(
-            "DELETE FROM intellidyn_user WHERE username = $1", &[&query.username]
+            "DELETE FROM intellidyn_incoming_steel_table WHERE challan_no = $1 AND heat_no = $2", &[&query.challan_no, &query.heat_no]
         )
         .await
-        .map(|val| Json(json!(DeleteUserResponse {
-            success: true,
-            data: Some(format!("{:?}", val)),
-            error: None,
-        })))
-        .map_err(|e| Json(json!(DeleteUserResponse {
-            success: false,
-            data: None,
-            error: Some(e.to_string())
-        })));
+        .map_err(|e|{
+            dbg!(e);
+            AppError::InternalServerError
+        })?;
 
-        match resp {
-            Ok(v) => v,
-            Err(e) => e
-        }
+        Ok(Json(json!(resp)))
     }
 }

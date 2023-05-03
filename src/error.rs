@@ -3,10 +3,10 @@ use axum::{
     response::IntoResponse,
     Json
 };
-
+use serde::Serialize;
 use serde_json::json;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum AppError {
     InternalServerError,
     ObjectAlreadyExists,
