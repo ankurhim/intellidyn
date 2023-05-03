@@ -38,7 +38,7 @@ impl CreateIncomingSteelRequest {
     pub async fn create_new_incoming_steel(
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
-        Json(payload): Json<Self>,
+        Json(payload): Json<Self>
     ) -> Result<Json<Value>, AppError> {
         
         let _create_table = service.client
@@ -63,115 +63,117 @@ impl CreateIncomingSteelRequest {
                 modified_on TIMESTAMP,
                 UNIQUE (challan_no, heat_no)
             );", &[]
-        ).
-        await
-        .map_err(|e|{
-            dbg!(e);
-            AppError::InternalServerError
-        })?;
-
-        let date_format = format_description!("[day].[month].[year]");
-
-        let new_incoming_steel = IncomingSteel {
-            incoming_pk: Uuid::new_v4(),
-            challan_no: payload.challan_no.clone(),
-            challan_date: Date::parse(&payload.challan_date, date_format).unwrap(),
-            grade: payload.grade.clone(),
-            section: payload.section.clone(),
-            section_type: payload.section_type.clone(),
-            heat_no: payload.heat_no.clone(),
-            heat_code: payload.heat_code.clone(),
-            jominy_value: payload.jominy_value.clone(),
-            received_qty: payload.received_qty.clone(),
-            actual_qty: payload.received_qty.clone(),
-            heat_status: None,
-            created_by: Some(logged_user.username.to_string()),
-            created_on: std::time::SystemTime::now(),
-            modified_by: None,
-            modified_on: None,
-        };
-
-        let result = service.client
-        .execute(
-            "INSERT INTO intellidyn_incoming_steel_table (
-                incoming_pk,
-                challan_no,
-                challan_date,
-                grade,
-                section,
-                section_type,
-                heat_no,
-                heat_code,
-                jominy_value,
-                received_qty,
-                actual_qty,
-                heat_status,
-                created_by,
-                created_on,
-                modified_by,
-                modified_on
-            ) VALUES (
-                $1,
-                $2,
-                $3,
-                $4,
-                $5,
-                $6,
-                $7,
-                $8,
-                $9,
-                $10,
-                $11,
-                $12,
-                $13,
-                $14,
-                $15,
-                $16
-            )", &[
-                &new_incoming_steel.incoming_pk.to_string(),
-                &new_incoming_steel.challan_no,
-                &new_incoming_steel.challan_date,
-                &new_incoming_steel.grade,
-                &new_incoming_steel.section,
-                &new_incoming_steel.section_type,
-                &new_incoming_steel.heat_no,
-                match &new_incoming_steel.heat_code {
-                    Some(v) => v,
-                    _ => &None::<String>
-                },
-                match &new_incoming_steel.jominy_value {
-                    Some(v) => v,
-                    _ => &None::<String>
-                },
-                &new_incoming_steel.received_qty,
-                &new_incoming_steel.actual_qty,
-                match &new_incoming_steel.heat_status {
-                    Some(v) => v,
-                    _ => &None::<String>
-                },
-                match &new_incoming_steel.created_by {
-                    Some(v) => v,
-                    _ => &None::<String>
-                },
-                &new_incoming_steel.created_on,
-                match &new_incoming_steel.modified_by {
-                    Some(v) => v,
-                    _ => &None::<String>
-                },
-                &new_incoming_steel.modified_on
-            ]
         )
         .await
-        .map_err(|_| AppError::InternalServerError)?;
+        .map_err(|e| {
+            dbg!(e);
+            AppError::InternalServerError
+        });
 
-        if result < 1 {
-            Err(AppError::InternalServerError)
+        let result = if !_create_table.is_err() {
+            let date_format = format_description!("[day].[month].[year]");
+
+            let new_incoming_steel = IncomingSteel {
+                incoming_pk: Uuid::new_v4(),
+                challan_no: payload.challan_no.clone(),
+                challan_date: Date::parse(&payload.challan_date, date_format).unwrap(),
+                grade: payload.grade.clone(),
+                section: payload.section.clone(),
+                section_type: payload.section_type.clone(),
+                heat_no: payload.heat_no.clone(),
+                heat_code: payload.heat_code.clone(),
+                jominy_value: payload.jominy_value.clone(),
+                received_qty: payload.received_qty.clone(),
+                actual_qty: payload.received_qty.clone(),
+                heat_status: None,
+                created_by: Some(logged_user.username.to_string()),
+                created_on: std::time::SystemTime::now(),
+                modified_by: None,
+                modified_on: None,
+            };
+    
+            let insert_result = service.client
+            .execute(
+                "INSERT INTO intellidyn_incoming_steel_table (
+                    incoming_pk,
+                    challan_no,
+                    challan_date,
+                    grade,
+                    section,
+                    section_type,
+                    heat_no,
+                    heat_code,
+                    jominy_value,
+                    received_qty,
+                    actual_qty,
+                    heat_status,
+                    created_by,
+                    created_on,
+                    modified_by,
+                    modified_on
+                ) VALUES (
+                    $1,
+                    $2,
+                    $3,
+                    $4,
+                    $5,
+                    $6,
+                    $7,
+                    $8,
+                    $9,
+                    $10,
+                    $11,
+                    $12,
+                    $13,
+                    $14,
+                    $15,
+                    $16
+                )", &[
+                    &new_incoming_steel.incoming_pk.to_string(),
+                    &new_incoming_steel.challan_no,
+                    &new_incoming_steel.challan_date,
+                    &new_incoming_steel.grade,
+                    &new_incoming_steel.section,
+                    &new_incoming_steel.section_type,
+                    &new_incoming_steel.heat_no,
+                    match &new_incoming_steel.heat_code {
+                        Some(v) => v,
+                        _ => &None::<String>
+                    },
+                    match &new_incoming_steel.jominy_value {
+                        Some(v) => v,
+                        _ => &None::<String>
+                    },
+                    &new_incoming_steel.received_qty,
+                    &new_incoming_steel.actual_qty,
+                    match &new_incoming_steel.heat_status {
+                        Some(v) => v,
+                        _ => &None::<String>
+                    },
+                    match &new_incoming_steel.created_by {
+                        Some(v) => v,
+                        _ => &None::<String>
+                    },
+                    &new_incoming_steel.created_on,
+                    match &new_incoming_steel.modified_by {
+                        Some(v) => v,
+                        _ => &None::<String>
+                    },
+                    &new_incoming_steel.modified_on
+                ]
+            )
+            .await
+            .map_err(|_| AppError::InternalServerError)?;
+
+            if insert_result < 1 {
+                Err(AppError::InternalServerError)
+            } else {
+                Ok(Json(json!(insert_result)))
+            }
         } else {
-            Ok(Json(json!(CreateIncomingSteelResponse {
-                success: true,
-                data: Some("Steel saved successfully!".to_string()),
-                error: None
-            })))
-        }
+            Err(AppError::InternalServerError)
+        };
+
+        result
     }
 }

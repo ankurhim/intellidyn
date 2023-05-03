@@ -46,20 +46,20 @@ impl FindApprovedHeatsRequest {
             part_vector.push(ApprovedComponent {
                 approval_pk: Uuid::parse_str(row.get(1)).unwrap(),
                 heat_no: row.get(2),
-                approved_part: row.get(3),
-                created_by: row.get(4),
-                created_on: row.get(5),
-                modified_by: row.get(6),
-                modified_on: row.get(7),
-                section: row.get(8),
-                section_type: row.get(9)
+                section: row.get(3),
+                section_type: row.get(4),
+                approved_part: row.get(5),
+                created_by: row.get(6),
+                created_on: row.get(7),
+                modified_by: row.get(8),
+                modified_on: row.get(9)
             })
         }
 
         Ok(Json(json!(part_vector)))
     }
 
-    pub async fn find_incoming_steels_by_filter(
+    pub async fn find_approved_heats_by_filter(
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
         Query(query): Query<FindApprovedHeatsRequest>,
@@ -80,13 +80,13 @@ impl FindApprovedHeatsRequest {
             part_vector.push(ApprovedComponent {
                 approval_pk: Uuid::parse_str(row.get(1)).unwrap(),
                 heat_no: row.get(2),
-                approved_part: row.get(3),
-                created_by: row.get(4),
-                created_on: row.get(5),
-                modified_by: row.get(6),
-                modified_on: row.get(7),
-                section: row.get(8),
-                section_type: row.get(9)
+                section: row.get(3),
+                section_type: row.get(4),
+                approved_part: row.get(5),
+                created_by: row.get(6),
+                created_on: row.get(7),
+                modified_by: row.get(8),
+                modified_on: row.get(9)
             })
         }
 
