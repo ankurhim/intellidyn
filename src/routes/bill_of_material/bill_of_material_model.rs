@@ -1,6 +1,7 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
-use chrono::naive::NaiveDateTime;
+
+use chrono::{DateTime, Local};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BillOfMaterial {
@@ -15,7 +16,8 @@ pub struct BillOfMaterial {
     pub gross_weight: f64,
     pub cut_weight: f64,
     pub created_by: Option<String>,
-    pub created_on: NaiveDateTime,
+    pub created_on: DateTime<Local>,
     pub modified_by: Option<String>,
-    pub modified_on: Option<NaiveDateTime>
+    pub modified_on: Option<DateTime<Local>>,
+    pub remarks: Option<String>
 }

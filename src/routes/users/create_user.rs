@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
-use chrono::{naive::NaiveDateTime, Utc};
+use chrono::Utc;
 use std::sync::Arc;
 use bcrypt::{ hash, DEFAULT_COST };
 use axum::{

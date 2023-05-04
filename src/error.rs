@@ -12,6 +12,7 @@ pub enum AppError {
     TableDoesNotExist,
     TableCreationFailed,
     DataInsertionFailed,
+    TableDeletionFailed
 }
 
 impl IntoResponse for AppError {
@@ -23,7 +24,8 @@ impl IntoResponse for AppError {
             ),
             Self::TableDoesNotExist => (StatusCode::BAD_REQUEST, "Table does not exist"),
             Self::TableCreationFailed => (StatusCode::BAD_REQUEST, "Table creation failed"),
-            Self::DataInsertionFailed => (StatusCode::INTERNAL_SERVER_ERROR, "Data insertion failed")
+            Self::DataInsertionFailed => (StatusCode::INTERNAL_SERVER_ERROR, "Data insertion failed"),
+            Self::TableDeletionFailed => (StatusCode::INTERNAL_SERVER_ERROR, "Table deletion failed"),
         };
 
         (status, Json(json!({"error": err_msg}))).into_response()
