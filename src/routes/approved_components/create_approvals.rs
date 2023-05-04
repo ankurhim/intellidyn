@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
-use time::{ Date, macros::{format_description, date}};
+
 use std::sync::Arc;
 use axum::{
     Extension,
@@ -150,7 +150,7 @@ impl CreateApprovedComponentRequest {
     }
 
     pub async fn alter_approved_component_table(
-        Extension(logged_user): Extension<Arc<User>>,
+        Extension(_logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>
     ) -> Result<Json<Value>, AppError> {
         let result = service.client

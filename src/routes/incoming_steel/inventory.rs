@@ -1,13 +1,13 @@
 use serde::{Serialize, Deserialize };
-use uuid::Uuid;
+
 use std::sync::Arc;
-use bcrypt::verify;
+
 use axum::{
     Extension,
     Json,
     extract::Query
 };
-use time::{ Date, macros::{format_description, date}};
+use time::{ Date, macros::{format_description}};
 
 use serde_json::{Value, json};
 
@@ -34,7 +34,7 @@ pub struct FindInventoryResponse {
 
 impl FindInventoryRequest {
     pub async fn get_inventory(
-        Extension(logged_user): Extension<Arc<User>>,
+        Extension(_logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Result<Json<Value>, AppError> {
         let mut steel_vector: Vec<SteelInventory> = Vec::new();
@@ -88,7 +88,7 @@ impl FindInventoryRequest {
     }
 
     pub async fn get_inventory_by_filter(
-        Extension(logged_user): Extension<Arc<User>>,
+        Extension(_logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
         Query(query): Query<FindInventoryRequest>,
     ) -> Result<Json<Value>, AppError> {
@@ -149,7 +149,7 @@ impl FindInventoryRequest {
 
 impl FindInventoryByDateRangeRequest {
     pub async fn get_inventory_by_date_range(
-        Extension(logged_user): Extension<Arc<User>>,
+        Extension(_logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
         Query(date_range): Query<FindInventoryByDateRangeRequest>
     ) -> Result<Json<Value>, AppError> {
@@ -157,8 +157,8 @@ impl FindInventoryByDateRangeRequest {
 
         let date_format = format_description!("%y-%m-%d");
 
-        let start_date = Date::parse(&date_range.start_date, &date_format).unwrap();
-        let end_date = Date::parse(&date_range.end_date, &date_format).unwrap();
+        let _start_date = Date::parse(&date_range.start_date, &date_format).unwrap();
+        let _end_date = Date::parse(&date_range.end_date, &date_format).unwrap();
 
         let resp = service.client
         .query(

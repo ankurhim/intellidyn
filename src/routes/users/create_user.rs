@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
-use std::time;
+use chrono::{naive::NaiveDateTime, Utc};
 use std::sync::Arc;
 use bcrypt::{ hash, DEFAULT_COST };
 use axum::{
@@ -68,7 +68,7 @@ impl CreateUserRequest {
                 _ => None,
             },
             created_by: Some(logged_user.username.to_string()),
-            created_on: time::SystemTime::now(),
+            created_on: Utc::now(),
             modified_by: None,
             modified_on: None,
         };

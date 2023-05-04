@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize };
-use std::time::SystemTime;
+use chrono::{naive::{NaiveDateTime}, DateTime, Utc};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -10,9 +10,9 @@ pub struct User {
     pub password: String,
     pub phone_no: Option<String>,
     pub created_by: Option<String>,
-    pub created_on: SystemTime,
+    pub created_on: DateTime<Utc>,
     pub modified_by: Option<String>,
-    pub modified_on: Option<SystemTime>
+    pub modified_on: Option<DateTime<Utc>>
 }
 
 impl User {
@@ -24,7 +24,7 @@ impl User {
             password: "admin@123".to_string(),
             phone_no: None,
             created_by: None,
-            created_on: SystemTime::now(),
+            created_on: Utc::now(),
             modified_by: None,
             modified_on: None
         }

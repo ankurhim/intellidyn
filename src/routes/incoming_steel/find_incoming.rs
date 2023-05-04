@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
-use bcrypt::verify;
+
 use axum::{
     Extension,
     Json,
@@ -10,7 +10,7 @@ use axum::{
 
 use serde_json::{Value, json};
 
-use crate::routes::incoming_steel::incoming_steel_model::{IncomingSteel, SteelInventory};
+use crate::routes::incoming_steel::incoming_steel_model::{IncomingSteel};
 use crate::routes::users::user_model::User;
 use crate::service::DbService;
 use crate::error::AppError;
@@ -33,7 +33,7 @@ pub struct FindInventoryByDateRangeRequest {
 
 impl FindIncomingSteelRequest {
     pub async fn find_incoming_steels(
-        Extension(logged_user): Extension<Arc<User>>,
+        Extension(_logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Result<Json<Value>, AppError> {
         let mut steel_vector: Vec<IncomingSteel> = Vec::new();
@@ -74,7 +74,7 @@ impl FindIncomingSteelRequest {
     }
 
     pub async fn find_incoming_steels_by_filter(
-        Extension(logged_user): Extension<Arc<User>>,
+        Extension(_logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
         Query(query): Query<FindIncomingSteelRequest>,
     ) -> Result<Json<Value>, AppError> {

@@ -27,7 +27,7 @@ pub struct FindUserResponse {
 
 impl FindUserRequest {
     pub async fn find_users(
-        Extension(logged_user): Extension<Arc<User>>,
+        Extension(_logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
         let mut user_vector: Vec<User> = Vec::new();
@@ -65,7 +65,7 @@ impl FindUserRequest {
     }
 
     pub async fn find_user_by_username(
-        Extension(logged_user): Extension<Arc<User>>,
+        Extension(_logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
         Query(query): Query<FindUserRequest>,
     ) -> Json<Value> {

@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
-use time::{ Date, macros::{format_description, date}};
+use time::{ Date, macros::{format_description}};
 use std::sync::Arc;
 use axum::{
     Extension,
@@ -186,7 +186,7 @@ impl CreateIncomingSteelRequest {
     }
 
     pub async fn drop_steel_incoming_table(
-        Extension(logged_user): Extension<Arc<User>>,
+        Extension(_logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Result<Json<Value>, AppError> {
         let result = service.client

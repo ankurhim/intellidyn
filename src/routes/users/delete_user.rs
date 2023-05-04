@@ -25,7 +25,7 @@ pub struct DeleteUserResponse {
 
 impl DeleteUserRequest {
     pub async fn delete_user_by_username(
-        Extension(logged_user): Extension<Arc<User>>,
+        Extension(_logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
         Query(query): Query<DeleteUserRequest>,
     ) -> Json<Value> {

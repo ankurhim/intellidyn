@@ -1,11 +1,10 @@
 use serde::{Serialize, Deserialize };
-use uuid::Uuid;
+
 use std::sync::Arc;
-use bcrypt::{hash, DEFAULT_COST};
+
 use axum::{
     Extension,
-    Json,
-    extract::Query
+    Json
 };
 
 use serde_json::{Value, json};

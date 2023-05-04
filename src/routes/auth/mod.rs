@@ -2,7 +2,7 @@ pub mod user_login;
 
 use axum::{
     Router,
-    routing::{get, post},
+    routing::{post},
 };
 
 use self::{

@@ -7,7 +7,7 @@ pub mod delete_incoming;
 
 use axum::{
     Router,
-    routing::{get, post, delete, put},
+    routing::{get, post, delete},
 };
 
 use self::{

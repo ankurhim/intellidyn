@@ -3,7 +3,7 @@ pub mod create_request;
 
 use axum::{
     Router,
-    routing::{get, post, delete, put},
+    routing::{get, post},
 };
 
 use self::{
