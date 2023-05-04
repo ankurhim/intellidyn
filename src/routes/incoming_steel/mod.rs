@@ -22,7 +22,7 @@ use self::{
 pub async fn create_incoming_routes() -> Router {
     Router::new()
     .route("/create_new_incoming_steel", post(CreateIncomingSteelRequest::create_new_incoming_steel))
-    .route("/find_incoming_steels", get(FindIncomingSteelRequest::find_incoming_steels))
+    .route("/find_all_incoming_steels", get(FindIncomingSteelRequest::find_all_incoming_steels))
     .route("/find_incoming_steels_by_filter", get(FindIncomingSteelRequest::find_incoming_steels_by_filter))
     .route("/get_inventory", get(FindInventoryRequest::get_inventory))
     .route("/get_inventory_by_filter", get(FindInventoryRequest::get_inventory_by_filter))

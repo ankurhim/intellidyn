@@ -1,7 +1,7 @@
 pub mod users;
 // pub mod auth;
 pub mod bill_of_material;
-// pub mod incoming_steel;
+pub mod incoming_steel;
 // pub mod approved_components;
 // pub mod cutting_production;
 

@@ -1,12 +1,13 @@
 use serde::{Serialize, Deserialize };
-use time::Date;
 use uuid::Uuid;
+
+use chrono::{DateTime, naive::NaiveDate, Local};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IncomingSteel {
     pub incoming_pk: Uuid,
     pub challan_no: String,
-    pub challan_date: Date,
+    pub challan_date: NaiveDate,
     pub grade: String,
     pub section: i64,
     pub section_type: String,
@@ -18,9 +19,10 @@ pub struct IncomingSteel {
     pub actual_qty: i64,
     pub heat_status: Option<String>,
     pub created_by: Option<String>,
-    pub created_on: std::time::SystemTime,
+    pub created_on: DateTime<Local>,
     pub modified_by: Option<String>,
-    pub modified_on: Option<std::time::SystemTime>
+    pub modified_on: Option<DateTime<Local>>,
+    pub remarks: Option<String>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -33,5 +35,6 @@ pub struct SteelInventory {
     pub total_received_qty: i64,
     pub total_issued_qty: i64,
     pub total_available_qty: i64,
-    pub heat_status: Option<String>
+    pub heat_status: Option<String>,
+    pub remarks: Option<String>
 }

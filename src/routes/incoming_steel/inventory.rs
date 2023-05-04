@@ -50,9 +50,10 @@ impl FindInventoryRequest {
                     SUM(received_qty) :: BIGINT AS total_received_qty,
                     SUM(issued_qty) :: BIGINT AS total_issued_qty,
                     SUM(received_qty - issued_qty) :: BIGINT AS total_available_qty,
-                    heat_status
+                    heat_status,
+                    remarks
             FROM
-                    intellidyn_incoming_steel_table
+                    mwspl_incoming_steel_table
             WHERE
                     heat_status IS NULL
             GROUP BY
@@ -61,7 +62,8 @@ impl FindInventoryRequest {
                     section,
                     section_type,
                     heat_code,
-                    heat_status;",
+                    heat_status,
+                    remarks;",
             &[]
         )
         .await
@@ -80,7 +82,8 @@ impl FindInventoryRequest {
                 total_received_qty: row.get(5),
                 total_issued_qty: row.get(6),
                 total_available_qty: row.get(7),
-                heat_status: row.get(8)
+                heat_status: row.get(8),
+                remarks: row.get(9)
             })
         }
 
@@ -105,7 +108,8 @@ impl FindInventoryRequest {
                     SUM(received_qty) :: BIGINT AS total_received_qty,
                     SUM(issued_qty) :: BIGINT AS total_issued_qty,
                     SUM(received_qty - issued_qty) :: BIGINT AS total_available_qty,
-                    heat_status
+                    heat_status,
+                    remarks
             FROM
                     intellidyn_incoming_steel_table
             WHERE
@@ -120,7 +124,8 @@ impl FindInventoryRequest {
                     section,
                     section_type,
                     heat_code,
-                    heat_status;",
+                    heat_status,
+                    remarks;",
             &[&query.filter]
         )
         .await
@@ -139,7 +144,8 @@ impl FindInventoryRequest {
                 total_received_qty: row.get(5),
                 total_issued_qty: row.get(6),
                 total_available_qty: row.get(7),
-                heat_status: row.get(8)
+                heat_status: row.get(8),
+                remarks: row.get(9)
             })
         }
 
@@ -171,9 +177,10 @@ impl FindInventoryByDateRangeRequest {
                     SUM(received_qty) :: BIGINT AS total_received_qty,
                     SUM(issued_qty) :: BIGINT AS total_issued_qty,
                     SUM(received_qty - issued_qty) :: BIGINT AS total_available_qty,
-                    heat_status
+                    heat_status,
+                    remarks
             FROM
-                    intellidyn_incoming_steel_table
+                    mwspl_incoming_steel_table
             WHERE
                     challan_date BETWEEN $1 AND $2
                     AND heat_status IS NULL
@@ -183,7 +190,8 @@ impl FindInventoryByDateRangeRequest {
                     section,
                     section_type,
                     heat_code,
-                    heat_status;",
+                    heat_status,
+                    remarks;",
             &[&date_range.start_date, &date_range.end_date]
         )
         .await
@@ -202,7 +210,8 @@ impl FindInventoryByDateRangeRequest {
                 total_received_qty: row.get(5),
                 total_issued_qty: row.get(6),
                 total_available_qty: row.get(7),
-                heat_status: row.get(8)
+                heat_status: row.get(8),
+                remarks: row.get(9)
             })
         }
 
