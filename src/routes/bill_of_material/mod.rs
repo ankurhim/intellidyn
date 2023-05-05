@@ -2,16 +2,18 @@ pub mod bill_of_material_model;
 pub mod create_bom;
 pub mod find_bom;
 pub mod update_bom;
+pub mod delete_bom;
 
 use axum::{
     Router,
-    routing::{post, get, put},
+    routing::{post, get, put, delete},
 };
 
 use self::{
     create_bom::CreateBillOfMaterialRequest,
     find_bom::FindBillOfMaterialRequest,
     update_bom::UpdateBillOfMaterialRequest,
+    delete_bom::DeleteBillOfMaterialRequest,
 };
 
 pub async fn create_bom_routes() -> Router {
@@ -22,4 +24,5 @@ pub async fn create_bom_routes() -> Router {
     .route("/find_table", get(FindBillOfMaterialRequest::find_bom_table))
     .route("/find_all_boms", get(FindBillOfMaterialRequest::find_all_boms))
     .route("/update_bom", put(UpdateBillOfMaterialRequest::update_bom))
+    .route("/delete_bom", delete(DeleteBillOfMaterialRequest::delete_bom))
 }
