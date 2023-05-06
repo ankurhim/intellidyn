@@ -57,20 +57,23 @@ impl FindBillOfMaterialRequest {
             for row in resp {
                 bom_vector.push(BillOfMaterial {
                     bom_pk: Uuid::parse_str(row.get(1)).unwrap(),
-                    part_no: row.get(2),
-                    part_name: row.get(3),
-                    part_code: row.get(4),
-                    grade: row.get(5),
-                    section: row.get(6),
-                    section_type: row.get(7),
-                    jominy_range: row.get(8),
-                    gross_weight: row.get(9),
-                    cut_weight: row.get(10),
-                    created_by: row.get(11),
-                    created_on: row.get(12),
-                    modified_by: row.get(13),
-                    modified_on: row.get(14),
-                    remarks: row.get(15)
+                    purchase_order_no: row.get(2),
+                    po_date: row.get(3),
+                    part_no: row.get(4),
+                    part_name: row.get(5),
+                    part_code: row.get(6),
+                    grade: row.get(7),
+                    section: row.get(8),
+                    section_type: row.get(9),
+                    jominy_range: row.get(10),
+                    gross_weight: row.get(11),
+                    cut_weight: row.get(12),
+                    po_status: row.get(13),
+                    created_by: row.get(14),
+                    created_on: row.get(15),
+                    modified_by: row.get(16),
+                    modified_on: row.get(17),
+                    remarks: row.get(18)
                 })
             }
         }

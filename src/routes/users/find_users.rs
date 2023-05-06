@@ -20,7 +20,6 @@ pub struct FindUserRequest {
 
 #[derive(Debug, Serialize)]
 pub struct FindUserResponse {
-    pub success: bool,
     pub data: Vec<User>,
     pub error: Option<String>
 }
@@ -34,11 +33,10 @@ impl FindUserRequest {
 
         let resp = service.client
         .query(
-            "SELECT * FROM intellidyn_user", &[]
+            "SELECT * FROM mwspl_user_table", &[]
         )
         .await
         .map_err(|e| Json(json!(FindUserResponse {
-            success: false,
             data: vec![],
             error: Some(e.to_string())
         })));
@@ -47,18 +45,19 @@ impl FindUserRequest {
             user_vector.push(User {
                 user_pk: Uuid::parse_str(row.get(1)).unwrap(),
                 full_name: row.get(2),
-                username: row.get(3),
-                password: row.get(4),
-                phone_no: row.get(5),
-                created_by: row.get(6),
-                created_on: row.get(7),
-                modified_by: row.get(8),
-                modified_on: row.get(9)
+                employee_id: row.get(3),
+                username: row.get(4),
+                password: row.get(5),
+                phone_no: row.get(6),
+                created_by: row.get(7),
+                created_on: row.get(8),
+                modified_by: row.get(9),
+                modified_on: row.get(10),
+                remarks: row.get(11)
             })
         }
 
         Json(json!(FindUserResponse {
-            success: true,
             data: user_vector,
             error: None,
         }))
@@ -73,11 +72,10 @@ impl FindUserRequest {
 
         let resp = service.client
         .query(
-            "SELECT * FROM intellidyn_user WHERE username = $1", &[&query.username]
+            "SELECT * FROM mwspl_user_table WHERE username = $1", &[&query.username]
         )
         .await
         .map_err(|e| Json(json!(FindUserResponse {
-            success: false,
             data: vec![],
             error: Some(e.to_string())
         })));
@@ -86,18 +84,19 @@ impl FindUserRequest {
             user_vector.push(User {
                 user_pk: Uuid::parse_str(row.get(1)).unwrap(),
                 full_name: row.get(2),
-                username: row.get(3),
-                password: row.get(4),
-                phone_no: row.get(5),
-                created_by: row.get(6),
-                created_on: row.get(7),
-                modified_by: row.get(8),
-                modified_on: row.get(9)
+                employee_id: row.get(3),
+                username: row.get(4),
+                password: row.get(5),
+                phone_no: row.get(6),
+                created_by: row.get(7),
+                created_on: row.get(8),
+                modified_by: row.get(9),
+                modified_on: row.get(10),
+                remarks: row.get(11)
             })
         }
 
         Json(json!(FindUserResponse {
-            success: true,
             data: user_vector,
             error: None,
         }))

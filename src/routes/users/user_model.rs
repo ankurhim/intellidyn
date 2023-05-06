@@ -1,32 +1,36 @@
-use serde::{Serialize, Deserialize };
-use chrono::{naive::{NaiveDateTime}, DateTime, Utc};
 use uuid::Uuid;
+use serde::{Serialize, Deserialize };
+use chrono::{DateTime, Local, NaiveDate};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct User {
     pub user_pk: Uuid,
     pub full_name: String,
+    pub employee_id: String,
     pub username: String,
     pub password: String,
     pub phone_no: Option<String>,
     pub created_by: Option<String>,
-    pub created_on: DateTime<Utc>,
+    pub created_on: DateTime<Local>,
     pub modified_by: Option<String>,
-    pub modified_on: Option<DateTime<Utc>>
+    pub modified_on: Option<DateTime<Local>>,
+    pub remarks: Option<String>
 }
 
 impl User {
     pub fn default() -> Self {
         User {
             user_pk: Uuid::new_v4(),
-            full_name: "".to_string(),
-            username: "Administrator".to_string(),
+            full_name: "Administrator".to_string(),
+            employee_id: "".to_string(),
+            username: "admin".to_string(),
             password: "admin@123".to_string(),
             phone_no: None,
             created_by: None,
-            created_on: Utc::now(),
+            created_on: Local::now(),
             modified_by: None,
-            modified_on: None
+            modified_on: None,
+            remarks: None
         }
     }
 }

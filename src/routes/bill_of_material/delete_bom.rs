@@ -17,12 +17,8 @@ use crate::error::AppError;
 use crate::routes::bill_of_material::bill_of_material_model::BillOfMaterial;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct UpdateBillOfMaterialRequest {
+pub struct DeleteBillOfMaterialRequest {
     pub part_no: String,
-    pub part_code: String,
-    pub grade: String,
-    pub section: i64,
-    pub section_type: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -51,35 +47,21 @@ impl UpdateBillOfMaterialRequest {
         .execute(
             "UPDATE mwspl_bill_of_material_table
             SET
-                part_no = $6,
-                part_name = $7,
-                part_code = $8,
-                grade = $9,
-                section = $10,
-                section_type = $11,
-                jominy_range = $12,
-                gross_weight = $13,
-                cut_weight = $14,
-                remarks = $15,
-                modified_by = $16,
-                modified_on = $17
-            WHERE
-                part_no = $1
-            AND
-                part_code = $2
-            AND
-                grade = $3
-            AND
-                section = $4
-            AND
-                section_type = $5
-            RETURNING *;",
+                part_no = $2,
+                part_name = $3,
+                part_code = $4,
+                grade = $5,
+                section = $6,
+                section_type = $7,
+                jominy_range = $8,
+                gross_weight = $9,
+                cut_weight = $10,
+                remarks = $11,
+                modified_by = $12,
+                modified_on = $13
+            WHERE part_no = $1;",
             &[
                 &query.part_no,
-                &query.part_code,
-                &query.grade,
-                &query.section,
-                &query.section_type,
                 &payload.part_no,
                 &payload.part_name,
                 &payload.part_code,
@@ -91,7 +73,7 @@ impl UpdateBillOfMaterialRequest {
                 &payload.cut_weight,
                 &payload.remarks,
                 &Some(logged_user.username.clone()),
-                &Local::now(),
+                &Local::now()
                 ]
         )
         .await
