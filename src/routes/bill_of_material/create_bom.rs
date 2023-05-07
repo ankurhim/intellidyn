@@ -57,7 +57,7 @@ impl CreateBillOfMaterialRequest {
                 modified_by TEXT,
                 modified_on TIMESTAMPTZ,
                 remarks TEXT,
-                UNIQUE (purchase_order_no, part_no, part_code, grade, section, section_type)
+                UNIQUE  (purchase_order_no, part_no, part_code, grade, section, section_type)
             );", &[]
         )
         .await

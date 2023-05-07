@@ -14,15 +14,12 @@ use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserLoginRequest {
-    pub full_name: Option<String>,
     pub username: Option<String>,
-    pub password: Option<String>,
-    pub phone_no: Option<String>,
+    pub password: Option<String>
 }
 
 #[derive(Debug, Serialize)]
 pub struct UserLoginResponse {
-    pub success: bool,
     pub data: Option<User>,
     pub error: Option<String>
 }
@@ -34,42 +31,36 @@ impl UserLoginRequest {
     ) -> Json<Value> {
         let query_result = service.client
         .query(
-            "SELECT * FROM intellidyn_user WHERE username = $1", &[
+            "SELECT * FROM mwspl_user_table WHERE username = $1", &[
                 &payload.username
                 ]
         )
         .await
         .map_err(|e| Json(json!(UserLoginResponse {
-            success: false,
             data: None,
             error: Some(e.to_string())
         })));
 
-        let result = &query_result.unwrap()[0];
+        let login_result = if &query_result.as_ref().unwrap().len() == &1 {
+            let result = &query_result.unwrap()[0];
 
-        let user = User {
-            user_pk: Uuid::parse_str(result.get(1)).unwrap(),
-            full_name: result.get(2),
-            username: result.get(3),
-            password: result.get(4),
-            phone_no: result.get(5),
-            created_by: result.get(6),
-            created_on: result.get(7),
-            modified_by: result.get(8),
-            modified_on: result.get(9)
-        };
-
-        let login_result = match verify(payload.password.unwrap(), &user.password).unwrap() {
-            true => Json(json!(UserLoginResponse {
-                success: true,
-                data: Some(user),
-                error: None
-            })),
-            false => Json(json!(UserLoginResponse {
-                success: false,
-                data: None,
-                error: None
-            })),
+            let user = User {
+                user_pk: Uuid::parse_str(result.get(1)).unwrap(),
+                full_name: result.get(2),
+                employee_id: result.get(3),
+                username: result.get(4),
+                password: result.get(5),
+                phone_no: result.get(6),
+                created_by: result.get(7),
+                created_on: result.get(8),
+                modified_by: result.get(9),
+                modified_on: result.get(10),
+                remarks: result.get(11)
+            };
+    
+            Json(json!(verify(payload.password.unwrap(), &user.password.unwrap()).unwrap()))
+        } else {
+            Json(json!(None::<bool>))
         };
 
         login_result

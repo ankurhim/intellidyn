@@ -1,5 +1,5 @@
 pub mod users;
-// pub mod auth;
+pub mod auth;
 pub mod purchase_orders;
 // pub mod bill_of_material;
 pub mod incoming_steel;
@@ -14,7 +14,7 @@ use std::sync::Arc;
 
 use crate::service::DbService;
 use crate::routes::users::create_user_routes;
-// use crate::routes::auth::create_auth_routes;
+use crate::routes::auth::create_auth_routes;
 use crate::routes::users::user_model::User;
 // use crate::routes::incoming_steel::create_incoming_routes;
 // use crate::routes::approved_components::create_approved_component_routes;
@@ -31,7 +31,7 @@ pub async fn create_routes() -> Router {
 
     let routes = Router::new()
     .nest("/users/", create_user_routes().await)
-    // .nest("/auth/", create_auth_routes().await)
+    .nest("/auth/", create_auth_routes().await)
     // .nest("/incoming_steels/", create_incoming_routes().await)
     // .nest("/approved_components/", create_approved_component_routes().await)
     // .nest("/cutting_production", create_steel_request_routes().await)

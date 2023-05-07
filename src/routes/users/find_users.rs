@@ -47,7 +47,7 @@ impl FindUserRequest {
                 full_name: row.get(2),
                 employee_id: row.get(3),
                 username: row.get(4),
-                password: row.get(5),
+                password: None::<String>,
                 phone_no: row.get(6),
                 created_by: row.get(7),
                 created_on: row.get(8),
@@ -57,10 +57,7 @@ impl FindUserRequest {
             })
         }
 
-        Json(json!(FindUserResponse {
-            data: user_vector,
-            error: None,
-        }))
+        Json(json!(user_vector))
     }
 
     pub async fn find_user_by_username(

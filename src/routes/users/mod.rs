@@ -21,7 +21,7 @@ pub async fn create_user_routes() -> Router {
     .route("/create_user_table", post(CreateUserRequest::create_user_table))
     .route("/drop_user_table", post(CreateUserRequest::drop_user_table))
     .route("/create_new_user", post(CreateUserRequest::create_new_user))
-    // .route("/find_users", get(FindUserRequest::find_users))
+    .route("/find_users", get(FindUserRequest::find_users))
     // .route("/find_user_by_username", get(FindUserRequest::find_user_by_username))
     // .route("/delete_user_by_username", delete(DeleteUserRequest::delete_user_by_username))
     // .route("/update_user_by_username", put(UpdateUserRequest::update_user_by_username))
