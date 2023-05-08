@@ -5,12 +5,14 @@ use chrono::{ DateTime, Local, NaiveDate };
 use axum::{
     Extension,
     Json,
+    extract::{Path, Query}
 };
 
 use serde_json::{Value, json};
 
 use crate::routes::User;
 use crate::service::DbService;
+use crate::routes::log::find_logs::FindLogRequest;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreatePurchaseOrderRequest {
@@ -22,7 +24,6 @@ pub struct CreatePurchaseOrderRequest {
     pub po_status: String,
     pub po_deactive_date: Option<String>,
     pub rate: f64,
-    pub created_by: String,
     pub remarks: Option<String>
 }
 
@@ -83,10 +84,12 @@ impl CreatePurchaseOrderRequest {
     }
 
     pub async fn create_new_purchase_order(
-        Extension(logged_user): Extension<Arc<User>>,
+        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<Self>,
     ) -> Json<Value> {
+
+        let log_key = FindLogRequest::find_active_log_by_username(Extension(service.clone()), Query(FindLogRequest { username: Some(user.clone()) })).await;
 
         let po_date = NaiveDate::parse_from_str(&payload.po_date, "%d-%m-%Y").expect("PO Date parsing error");
         let po_received_date = match &payload.po_received_date {
@@ -130,7 +133,7 @@ impl CreatePurchaseOrderRequest {
                 &payload.po_status,
                 &po_deactive_date,
                 &payload.rate,
-                &payload.created_by,
+                &user,
                 &Local::now(),
                 &None::<String>,
                 &None::<DateTime<Local>>,

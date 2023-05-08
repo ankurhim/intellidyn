@@ -10,6 +10,8 @@ use axum::{
 use serde_json::{Value, json};
 
 use crate::routes::users::user_model::User;
+use crate::routes::log::create_log::CreateLogRequest;
+use crate::routes::log::find_logs::FindLogRequest;
 use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -29,6 +31,9 @@ impl UserLoginRequest {
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<UserLoginRequest>,
     ) -> Json<Value> {
+
+        let log_result = FindLogRequest::find_count_of_active_log_by_username(Extension(service.clone()), Json(payload.clone().username.unwrap())).await;
+
         let query_result = service.client
         .query(
             "SELECT * FROM mwspl_user_table WHERE username = $1", &[
@@ -59,8 +64,8 @@ impl UserLoginRequest {
             };
     
             match verify(payload.password.unwrap(), &user.password.unwrap()).unwrap() {
-                true => Json(json!(Some(Uuid::new_v4().to_string()))),
-                false => Json(json!(Some("Invalid Credentials")))
+                false => Json(json!(Some("Invalid Credentials"))),
+                true => CreateLogRequest::create_new_log(Extension(service.clone()), Json(CreateLogRequest { username: user.username, login_key: Uuid::new_v4().to_string() })).await
             }
         } else {
             Json(json!(None::<bool>))
