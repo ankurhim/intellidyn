@@ -17,6 +17,8 @@ use self::{
 pub async fn create_auth_routes() -> Router {
     Router::new()
     .route("/login", post(UserLoginRequest::user_login))
+    .route("/create_auth_table", post(CreateAuthRequest::create_auth_table))
+    .route("/delete_auth_table", post(CreateAuthRequest::drop_auth_table))
     .route("/create_new_auth", post(CreateAuthRequest::create_new_auth))
     .route("/find_auths", get(FindAuthRequest::find_auths))
 }

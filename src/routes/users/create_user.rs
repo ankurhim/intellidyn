@@ -35,6 +35,9 @@ impl CreateUserRequest {
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
+
+        let drop_table = Self::drop_user_table(Extension(logged_user.clone()), Extension(service.clone())).await;
+
         let create_user_table = service.client
         .execute(
             "CREATE TABLE IF NOT EXISTS mwspl_user_table (
@@ -42,7 +45,7 @@ impl CreateUserRequest {
                 user_pk TEXT NOT NULL,
                 full_name TEXT NOT NULL,
                 employee_id TEXT NOT NULL,
-                username TEXT NOT NULL,
+                username TEXT NOT NULL PRIMARY KEY,
                 password TEXT NOT NULL,
                 phone_no TEXT,
                 created_by TEXT NOT NULL,

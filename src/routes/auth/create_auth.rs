@@ -32,30 +32,35 @@ impl CreateAuthRequest {
         Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
+
+        let drop_table = Self::drop_auth_table(Extension(logged_user.clone()), Extension(service.clone())).await;
+
         let create_auth_table = service.client
         .execute(
             "CREATE TABLE IF NOT EXISTS mwspl_auth_table (
-                id SERIAL NOT NULL,
+                id SERIAL PRIMARY KEY,
                 auth_pk TEXT NOT NULL,
-                username TEXT NOT NULL,
-                auth TEXT NOT NULL,
-                created_by TEXT NOT NULL,
+                username TEXT NOT NULL REFERENCES mwspl_user_table(username) ON DELETE CASCADE,
+                auth TEXT,
+                created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON DELETE CASCADE,
                 created_on TIMESTAMPTZ NOT NULL,
-                modified_by TEXT,
+                modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE CASCADE,
                 modified_on TIMESTAMPTZ,
                 remarks TEXT,
                 UNIQUE (username, auth)
-            );", &[]
+              );", &[]
         )
         .await
         .map(|val| Json(json!(CreateAuthResponse {
             data: Some(format!("{:?}", val)),
             error: None,
         })))
-        .map_err(|e| Json(json!(CreateAuthResponse {
+        .map_err(|e| {
+            dbg!(&e);
+            Json(json!(CreateAuthResponse {
             data: None,
             error: Some(e.to_string())
-        })));
+        }))});
 
         match create_auth_table {
             Ok(v) => v,
@@ -92,9 +97,10 @@ impl CreateAuthRequest {
 
         let create_table = Self::create_auth_table(Extension(logged_user.clone()), Extension(service.clone())).await;
 
-        let mut counter = 0;
+        let mut result = Json(json!("Success"));
+
         for auth in &payload.auths{
-            service.client
+            result = service.client
             .execute(
                 "INSERT INTO mwspl_auth_table(
                     auth_pk,
@@ -105,7 +111,7 @@ impl CreateAuthRequest {
                     modified_by,
                     modified_on,
                     remarks
-                ) VALUES ($1, $2, #3, $4, $5, $6, $7, $8) INNER JOIN mwspl_user_table ON mwspl_user_table.username = mwspl_auth_table.username",
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
                 &[
                     &Uuid::new_v4().to_string(),
                     &payload.username,
@@ -118,24 +124,17 @@ impl CreateAuthRequest {
                 ]
             )
             .await
-            .map(|val| {
-                counter += 1;
+            .map(|val| 
                 Json(json!(CreateAuthResponse {
-                data: Some(format!("{:?}", val)),
-                error: None,
-            }))})
+                    data: Some(val.to_string()),
+                    error: None
+            })))
             .map_err(|e| {
                 Json(json!(CreateAuthResponse {
                 data: None,
                 error: Some(e.as_db_error().unwrap().message().to_string())
-            }))});
+            }))}).unwrap();
         }
-
-        let result = if counter == payload.auths.len() {
-            Json(json!(1))
-        } else {
-            Json(json!(0))
-        };
 
         result
     }
