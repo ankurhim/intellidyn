@@ -58,7 +58,10 @@ impl UserLoginRequest {
                 remarks: result.get(11)
             };
     
-            Json(json!(verify(payload.password.unwrap(), &user.password.unwrap()).unwrap()))
+            match verify(payload.password.unwrap(), &user.password.unwrap()).unwrap() {
+                true => Json(json!(Some(Uuid::new_v4().to_string()))),
+                false => Json(json!(Some("Invalid Credentials")))
+            }
         } else {
             Json(json!(None::<bool>))
         };
