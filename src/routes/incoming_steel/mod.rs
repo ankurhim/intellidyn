@@ -1,9 +1,8 @@
 pub mod incoming_steel_model;
 pub mod create_incoming;
 pub mod find_incoming;
-pub mod inventory;
-pub mod delete_incoming;
-// pub mod update_user;
+// pub mod inventory;
+// pub mod delete_incoming;
 
 use axum::{
     Router,
@@ -13,19 +12,15 @@ use axum::{
 use self::{
     create_incoming::CreateIncomingSteelRequest,
     find_incoming::FindIncomingSteelRequest,
-    inventory::{ FindInventoryRequest, FindInventoryByDateRangeRequest },
-    delete_incoming::DeleteIncomingSteelRequest,
-    // update_user::UpdateUserRequest,
+    // inventory::{ FindInventoryRequest, FindInventoryByDateRangeRequest },
+    // delete_incoming::DeleteIncomingSteelRequest,
 };
 
-pub async fn create_incoming_routes() -> Router {
+pub async fn create_incoming_steel_routes() -> Router {
     Router::new()
-    .route("/create_new_incoming_steel", post(CreateIncomingSteelRequest::create_new_incoming_steel))
-    .route("/find_all_incoming_steels", get(FindIncomingSteelRequest::find_all_incoming_steels))
-    .route("/find_incoming_steels_by_filter", get(FindIncomingSteelRequest::find_incoming_steels_by_filter))
-    .route("/get_inventory", get(FindInventoryRequest::get_inventory))
-    .route("/get_inventory_by_filter", get(FindInventoryRequest::get_inventory_by_filter))
-    .route("/get_inventory_by_date_range", get(FindInventoryByDateRangeRequest::get_inventory_by_date_range))
-    .route("/delete_steel_by_filter", delete(DeleteIncomingSteelRequest::delete_steel_by_filter))
-    // .route("/update_user_by_username", put(UpdateUserRequest::update_user_by_username))
+    .route("/create_incoming_steel_table", post(CreateIncomingSteelRequest::create_incoming_steel_table))
+    .route("/drop_incoming_steel_table", post(CreateIncomingSteelRequest::drop_incoming_steel_table))
+    .route("/:user/:login_key/create_new_incoming_steel", post(CreateIncomingSteelRequest::create_new_incoming_steel))
+    .route("/:user/:login_key/find_all_incoming_steels", get(FindIncomingSteelRequest::find_all_incoming_steels))
+    .route("/:user/:login_key/find_all_incoming_steels_by_filter", get(FindIncomingSteelRequest::find_all_incoming_steels_by_filter))
 }
