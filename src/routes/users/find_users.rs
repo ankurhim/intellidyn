@@ -4,7 +4,7 @@ use std::sync::Arc;
 use axum::{
     Extension,
     Json,
-    extract::Query
+    extract::{Query, Path}
 };
 
 use serde_json::{Value, json};
@@ -26,7 +26,7 @@ pub struct FindUserResponse {
 
 impl FindUserRequest {
     pub async fn find_users(
-        Extension(_logged_user): Extension<Arc<User>>,
+        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
         let mut user_vector: Vec<User> = Vec::new();
@@ -61,7 +61,7 @@ impl FindUserRequest {
     }
 
     pub async fn find_user_by_username(
-        Extension(_logged_user): Extension<Arc<User>>,
+        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
         Query(query): Query<FindUserRequest>,
     ) -> Json<Value> {

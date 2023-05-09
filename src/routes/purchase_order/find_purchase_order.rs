@@ -1,11 +1,11 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
-use chrono::{ DateTime, Utc };
+use chrono::{ DateTime, Local };
 use axum::{
     Extension,
     Json,
-    extract::Query
+    extract::{Query, Path}
 };
 
 use serde_json::{Value, json};
@@ -38,9 +38,25 @@ impl FindPurchaseOrderRequest {
     }
 
     pub async fn find_all_purchase_orders(
-        Extension(logged_user): Extension<Arc<User>>,
+        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
+
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+
         let mut po_vector: Vec<PurchaseOrder> = Vec::new();
         
         let resp = service.client
@@ -61,9 +77,10 @@ impl FindPurchaseOrderRequest {
                 rate: row.get(9),
                 created_by: row.get(10),
                 created_on: row.get(11),
-                modified_by: row.get(12),
-                modified_on: row.get(13),
-                remarks: row.get(14)
+                login_key: row.get(12),
+                modified_by: row.get(13),
+                modified_on: row.get(14),
+                remarks: row.get(15)
             })
         };
         match &po_vector.len() {
@@ -73,10 +90,26 @@ impl FindPurchaseOrderRequest {
     }
 
     pub async fn find_all_purchase_orders_by_po_no(
-        Extension(logged_user): Extension<Arc<User>>,
+        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
         Query(payload): Query<FindPurchaseOrderRequest>
     ) -> Json<Value> {
+
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+
         let mut po_vector: Vec<PurchaseOrder> = Vec::new();
         
         let resp = service.client
@@ -97,9 +130,10 @@ impl FindPurchaseOrderRequest {
                 rate: row.get(9),
                 created_by: row.get(10),
                 created_on: row.get(11),
-                modified_by: row.get(12),
-                modified_on: row.get(13),
-                remarks: row.get(14)
+                login_key: row.get(12),
+                modified_by: row.get(13),
+                modified_on: row.get(14),
+                remarks: row.get(15)
             })
         };
         match &po_vector.len() {

@@ -34,7 +34,7 @@ impl CreateLogRequest {
                 id SERIAL NOT NULL,
                 log_pk TEXT NOT NULL,
                 username TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
-                login_key TEXT NOT NULL,
+                login_key TEXT NOT NULL PRIMARY KEY,
                 login_time TIMESTAMPTZ NOT NULL,
                 logout_time TIMESTAMPTZ,
                 remarks TEXT,

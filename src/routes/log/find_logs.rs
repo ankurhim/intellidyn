@@ -4,8 +4,9 @@ use std::sync::Arc;
 use axum::{
     Extension,
     Json,
-    extract::Query
+    extract::{Query, Path}
 };
+use chrono::{DateTime, Local};
 
 use serde_json::{Value, json};
 
@@ -26,8 +27,24 @@ pub struct FindLogResponse {
 
 impl FindLogRequest {
     pub async fn find_logs(
+        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+
         let mut log_vector: Vec<Log> = Vec::new();
 
         let resp = service.client

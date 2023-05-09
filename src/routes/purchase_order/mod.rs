@@ -17,6 +17,6 @@ pub async fn create_purchase_order_routes() -> Router {
     .route("/create_purchase_order_table", post(CreatePurchaseOrderRequest::create_purchase_order_table))
     .route("/drop_purchase_order_table", post(CreatePurchaseOrderRequest::drop_purchase_order_table))
     .route("/:user/:login_key/create_new_purchase_order", post(CreatePurchaseOrderRequest::create_new_purchase_order))
-    .route("/find_all_purchase_orders", get(FindPurchaseOrderRequest::find_all_purchase_orders))
-    .route("/find_all_purchase_orders_by_po_no", get(FindPurchaseOrderRequest::find_all_purchase_orders_by_po_no))
+    .route("/:user/:login_key/find_all_purchase_orders", get(FindPurchaseOrderRequest::find_all_purchase_orders))
+    .route("/:user/:login_key/find_all_purchase_orders_by_po_no", get(FindPurchaseOrderRequest::find_all_purchase_orders_by_po_no))
 }
