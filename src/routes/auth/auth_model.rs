@@ -1,6 +1,6 @@
 use uuid::Uuid;
 use serde::{Serialize, Deserialize };
-use chrono::{DateTime, Local, NaiveDate};
+use chrono::{DateTime, Local};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Auth{

@@ -30,8 +30,6 @@ pub async fn create_routes() -> Router {
     .await
     .unwrap());
 
-    let logged_user = Arc::new(User::default());
-
     let routes = Router::new()
     .nest("/users/", create_user_routes().await)
     .nest("/auth/", create_auth_routes().await)

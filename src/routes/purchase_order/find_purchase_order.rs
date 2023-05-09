@@ -10,7 +10,6 @@ use axum::{
 
 use serde_json::{Value, json};
 
-use crate::routes::User;
 use crate::service::DbService;
 use crate::routes::purchase_order::purchase_order_model::PurchaseOrder;
 
@@ -21,7 +20,7 @@ pub struct FindPurchaseOrderRequest {
 
 impl FindPurchaseOrderRequest {
     pub async fn find_po_table(
-        Extension(logged_user): Extension<Arc<User>>,
+        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
         match service.client
@@ -75,12 +74,21 @@ impl FindPurchaseOrderRequest {
                 po_status: row.get(7),
                 po_deactive_date: row.get(8),
                 rate: row.get(9),
-                created_by: row.get(10),
-                created_on: row.get(11),
-                login_key: row.get(12),
-                modified_by: row.get(13),
-                modified_on: row.get(14),
-                remarks: row.get(15)
+                drawing_no: row.get(10),
+                part_name: row.get(11),
+                part_no: row.get(12),
+                grade: row.get(13),
+                section: row.get(14),
+                section_type: row.get(15),
+                jominy_range: row.get(16),
+                gross_weight: row.get(17),
+                cut_weight: row.get(18),
+                created_by: row.get(19),
+                created_on: row.get(20),
+                login_key: row.get(21),
+                modified_by: row.get(22),
+                modified_on: row.get(23),
+                remarks: row.get(24)
             })
         };
         match &po_vector.len() {
@@ -128,12 +136,21 @@ impl FindPurchaseOrderRequest {
                 po_status: row.get(7),
                 po_deactive_date: row.get(8),
                 rate: row.get(9),
-                created_by: row.get(10),
-                created_on: row.get(11),
-                login_key: row.get(12),
-                modified_by: row.get(13),
-                modified_on: row.get(14),
-                remarks: row.get(15)
+                drawing_no: row.get(10),
+                part_name: row.get(11),
+                part_no: row.get(12),
+                grade: row.get(13),
+                section: row.get(14),
+                section_type: row.get(15),
+                jominy_range: row.get(16),
+                gross_weight: row.get(17),
+                cut_weight: row.get(18),
+                created_by: row.get(19),
+                created_on: row.get(20),
+                login_key: row.get(21),
+                modified_by: row.get(22),
+                modified_on: row.get(23),
+                remarks: row.get(24)
             })
         };
         match &po_vector.len() {

@@ -1,20 +1,14 @@
 use serde::{Serialize, Deserialize };
-use uuid::Uuid;
 use std::sync::Arc;
-use std::ops::Deref;
-use bcrypt::verify;
 use axum::{
     Extension,
     Json,
-    extract::{Path, Query}
+    extract::Path
 };
 use chrono::Local;
 
 use serde_json::{Value, json};
 
-use crate::routes::users::user_model::User;
-use crate::routes::log::create_log::CreateLogRequest;
-use crate::routes::log::find_logs::FindLogRequest;
 use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

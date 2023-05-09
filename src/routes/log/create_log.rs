@@ -1,19 +1,13 @@
-/// Dependencies imports
 use uuid::Uuid;
 use std::sync::Arc;
 use axum::{Extension, Json,extract::Query};
 use serde_json::{Value, json};
 use serde::{Serialize, Deserialize };
-use chrono::{DateTime, Local, NaiveDate};
-///
-/// Local crate imports
-// use crate::error::AppError;
+use chrono::{DateTime, Local};
+
 use crate::service::DbService;
-use crate::routes::users::user_model::User;
 use crate::routes::log::find_logs::FindLogRequest;
-///
-/// Definition of user payload data for creating
-/// new user
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateLogRequest {
     pub username: String,

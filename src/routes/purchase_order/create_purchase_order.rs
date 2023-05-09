@@ -2,17 +2,10 @@ use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
 use chrono::{ DateTime, Local, NaiveDate };
-use axum::{
-    Extension,
-    Json,
-    extract::{Path, Query}
-};
-
+use axum::{Extension, Json, extract::{Path}};
 use serde_json::{Value, json};
 
-use crate::routes::User;
 use crate::service::DbService;
-use crate::routes::log::find_logs::FindLogRequest;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreatePurchaseOrderRequest {
@@ -24,6 +17,15 @@ pub struct CreatePurchaseOrderRequest {
     pub po_status: String,
     pub po_deactive_date: Option<String>,
     pub rate: f64,
+    pub drawing_no: String,
+    pub part_name: String,
+    pub part_no: String,
+    pub grade: String,
+    pub section: i64,
+    pub section_type: String,
+    pub jominy_range: Option<String>,
+    pub gross_weight: f64,
+    pub cut_weight: f64,
     pub remarks: Option<String>
 }
 
@@ -35,23 +37,31 @@ impl CreatePurchaseOrderRequest {
         match service.client
         .execute(
             "CREATE TABLE IF NOT EXISTS mwspl_purchase_order_table(
-                id SERIAL,
+                id SERIAL NOT NULL,
                 purchase_order_pk TEXT NOT NULL,
                 purchase_order_no TEXT NOT NULL PRIMARY KEY,
                 po_date DATE NOT NULL,
                 po_quantity BIGINT,
                 po_received_date DATE,
                 po_effective_date DATE,
-                po_status TEXT NOT NULL,
+                po_status TEXT,
                 po_deactive_date DATE,
-                rate FLOAT8 NOT NULL,
-                created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON DELETE CASCADE,
+                rate FLOAT8,
+                drawing_no TEXT NOT NULL,
+                part_name TEXT NOT NULL,
+                part_no TEXT NOT NULL,
+                grade TEXT NOT NULL,
+                section BIGINT NOT NULL,
+                section_type TEXT NOT NULL,
+                jominy_range TEXT,
+                gross_weight FLOAT8 NOT NULL,
+                cut_weight FLOAT8 NOT NULL,
+                created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 created_on TIMESTAMPTZ NOT NULL,
                 login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
-                modified_by TEXT REFERENCES mwspl_user_table(username) ON DELETE CASCADE,
+                modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE NO ACTION,
                 modified_on TIMESTAMPTZ,
-                remarks TEXT,
-                UNIQUE (purchase_order_no)
+                remarks TEXT
             );",
             &[]
         )

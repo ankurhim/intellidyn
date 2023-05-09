@@ -5,7 +5,7 @@ use axum::{Extension, Json};
 use serde_json::{Value, json};
 use bcrypt::{ hash, DEFAULT_COST };
 use serde::{Serialize, Deserialize };
-use chrono::{DateTime, Local, NaiveDate};
+use chrono::{DateTime, Local};
 ///
 /// Local crate imports
 // use crate::error::AppError;

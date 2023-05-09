@@ -10,7 +10,6 @@ use chrono::{DateTime, Local};
 
 use serde_json::{Value, json};
 
-use crate::routes::users::user_model::User;
 use crate::routes::log::log_model::Log;
 use crate::service::DbService;
 

@@ -4,7 +4,6 @@ use std::sync::Arc;
 use axum::{
     Extension,
     Json,
-    extract::Query
 };
 
 use serde_json::{Value, json};

@@ -4,12 +4,11 @@ use std::sync::Arc;
 use axum::{Extension, Json};
 use serde_json::{Value, json};
 use serde::{Serialize, Deserialize };
-use chrono::{DateTime, Local, NaiveDate};
+use chrono::{DateTime, Local};
 ///
 /// Local crate imports
 use crate::routes::User;
 use crate::service::DbService;
-use crate::routes::auth::auth_model::Auth;
 ///
 /// Definition of user payload data for creating
 /// new user

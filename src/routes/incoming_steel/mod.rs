@@ -11,7 +11,6 @@ use axum::{
 };
 
 use self::{
-    incoming_steel_model::IncomingSteel,
     create_incoming::CreateIncomingSteelRequest,
     find_incoming::FindIncomingSteelRequest,
     inventory::{ FindInventoryRequest, FindInventoryByDateRangeRequest },
