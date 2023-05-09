@@ -20,7 +20,6 @@ pub struct FindPurchaseOrderRequest {
 
 impl FindPurchaseOrderRequest {
     pub async fn find_po_table(
-        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
         match service.client

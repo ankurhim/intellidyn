@@ -11,7 +11,6 @@ use serde_json::{Value, json};
 
 use crate::routes::users::user_model::User;
 use crate::routes::log::create_log::CreateLogRequest;
-use crate::routes::log::find_logs::FindLogRequest;
 use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -31,8 +30,6 @@ impl UserLoginRequest {
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<UserLoginRequest>,
     ) -> Json<Value> {
-
-        let log_result = FindLogRequest::find_count_of_active_log_by_username(Extension(service.clone()), Json(payload.clone().username.unwrap())).await;
 
         let query_result = service.client
         .query(

@@ -1,7 +1,7 @@
 /// Dependencies imports
 use uuid::Uuid;
 use std::sync::Arc;
-use axum::{Extension, Json};
+use axum::{Extension, Json, extract::Path};
 use serde_json::{Value, json};
 use bcrypt::{ hash, DEFAULT_COST };
 use serde::{Serialize, Deserialize };
@@ -10,7 +10,6 @@ use chrono::{DateTime, Local};
 /// Local crate imports
 // use crate::error::AppError;
 use crate::service::DbService;
-use crate::routes::users::user_model::User;
 ///
 /// Definition of user payload data for creating
 /// new user
@@ -32,11 +31,8 @@ pub struct CreateUserResponse {
 impl CreateUserRequest {
 
     pub async fn create_user_table(
-        Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
-
-        let drop_table = Self::drop_user_table(Extension(logged_user.clone()), Extension(service.clone())).await;
 
         let create_user_table = service.client
         .execute(
@@ -73,7 +69,6 @@ impl CreateUserRequest {
     }
 
     pub async fn drop_user_table(
-        Extension(logged_user): Extension<Arc<User>>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
         let drop_user_table = service.client
@@ -94,12 +89,25 @@ impl CreateUserRequest {
     }
 
     pub async fn create_new_user(
-        Extension(logged_user): Extension<Arc<User>>,
+        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<Self>,
     ) -> Json<Value> {
 
-        let create_table = Self::create_user_table(Extension(logged_user.clone()), Extension(service.clone())).await;
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
 
         let hash = hash(&payload.password, DEFAULT_COST).expect("Hashing failed");
 
@@ -125,7 +133,7 @@ impl CreateUserRequest {
                 &payload.username,
                 &hash,
                 &Some(payload.phone_no),
-                &Some(logged_user.username.clone()),
+                &user,
                 &Local::now(),
                 &None::<String>,
                 &None::<DateTime<Local>>,

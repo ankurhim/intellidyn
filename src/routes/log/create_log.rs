@@ -20,8 +20,6 @@ impl CreateLogRequest {
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
 
-        let drop_table = Self::drop_log_table(Extension(service.clone())).await;
-
         let create_log_table = service.client
         .execute(
             "CREATE TABLE IF NOT EXISTS mwspl_log_table (
@@ -83,7 +81,7 @@ impl CreateLogRequest {
             ]
         )
         .await
-        .map(|val| async {
+        .map(|_| async {
             let query = FindLogRequest {username: Some(payload.username) };
             FindLogRequest::find_active_log_by_username(Extension(service.clone()), Query(query)).await
         })

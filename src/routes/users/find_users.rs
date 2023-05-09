@@ -6,6 +6,7 @@ use axum::{
     Json,
     extract::{Query, Path}
 };
+use chrono::{DateTime, Local};
 
 use serde_json::{Value, json};
 
@@ -29,6 +30,22 @@ impl FindUserRequest {
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
+
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+        
         let mut user_vector: Vec<User> = Vec::new();
 
         let resp = service.client
@@ -65,6 +82,22 @@ impl FindUserRequest {
         Extension(service): Extension<Arc<DbService>>,
         Query(query): Query<FindUserRequest>,
     ) -> Json<Value> {
+
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+
         let mut user_vector: Vec<User> = Vec::new();
 
         let resp = service.client
