@@ -58,10 +58,12 @@ impl CreatePurchaseOrderRequest {
                 cut_weight FLOAT8 NOT NULL,
                 created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 created_on TIMESTAMPTZ NOT NULL,
-                login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
+                created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE NO ACTION,
                 modified_on TIMESTAMPTZ,
-                remarks TEXT
+                modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
+                remarks TEXT,
+                UNIQUE (purchase_order_no, part_no)
             );",
             &[]
         )
@@ -139,13 +141,23 @@ impl CreatePurchaseOrderRequest {
                 po_status,
                 po_deactive_date,
                 rate,
+                drawing_no,
+                part_name,
+                part_no,
+                grade,
+                section,
+                section_type,
+                jominy_range,
+                gross_weight,
+                cut_weight,
                 created_by,
                 created_on,
-                login_key,
+                created_login_key,
                 modified_by,
                 modified_on,
+                modified_login_key,
                 remarks
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,$17, $18, $19, $20, $21, $22, $23, $24, $25)",
             &[
                 &Uuid::new_v4().to_string(),
                 &payload.purchase_order_no,
@@ -156,11 +168,21 @@ impl CreatePurchaseOrderRequest {
                 &payload.po_status,
                 &po_deactive_date,
                 &payload.rate,
+                &payload.drawing_no,
+                &payload.part_name,
+                &payload.part_no,
+                &payload.grade,
+                &payload.section,
+                &payload.section_type,
+                &payload.jominy_range,
+                &payload.gross_weight,
+                &payload.cut_weight,
                 &user,
                 &Local::now(),
                 &login_key,
                 &None::<String>,
                 &None::<DateTime<Local>>,
+                &None::<String>,
                 &payload.remarks
             ]
         )

@@ -84,10 +84,11 @@ impl FindPurchaseOrderRequest {
                 cut_weight: row.get(18),
                 created_by: row.get(19),
                 created_on: row.get(20),
-                login_key: row.get(21),
+                created_login_key: row.get(21),
                 modified_by: row.get(22),
                 modified_on: row.get(23),
-                remarks: row.get(24)
+                modified_login_key: row.get(24),
+                remarks: row.get(25)
             })
         };
         match &po_vector.len() {
@@ -146,10 +147,11 @@ impl FindPurchaseOrderRequest {
                 cut_weight: row.get(18),
                 created_by: row.get(19),
                 created_on: row.get(20),
-                login_key: row.get(21),
+                created_login_key: row.get(21),
                 modified_by: row.get(22),
                 modified_on: row.get(23),
-                remarks: row.get(24)
+                modified_login_key: row.get(24),
+                remarks: row.get(25)
             })
         };
         match &po_vector.len() {

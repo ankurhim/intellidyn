@@ -25,8 +25,9 @@ pub struct PurchaseOrder {
     pub cut_weight: f64,
     pub created_by: Option<String>,
     pub created_on: DateTime<Local>,
-    pub login_key: String,
+    pub created_login_key: String,
     pub modified_by: Option<String>,
     pub modified_on: Option<DateTime<Local>>,
+    pub modified_login_key: Option<String>,
     pub remarks: Option<String>
 }
