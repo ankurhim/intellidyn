@@ -7,17 +7,17 @@ use serde_json::{Value, json};
 use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct UpdatePurchaseOrderRequest {
+pub struct UpdateBillOfMaterialRequest {
     pub purchase_order_no: String,
     pub drawing_no: String,
     pub po_status: String,
 }
 
-impl UpdatePurchaseOrderRequest {
-    pub async fn update_po_status_by_filter(
+impl UpdateBillOfMaterialRequest {
+    pub async fn update_bom_status_by_filter(
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
-        Query(payload): Query<UpdatePurchaseOrderRequest>
+        Query(payload): Query<UpdateBillOfMaterialRequest>
     ) -> Json<Value> {
 
         let resp = service.client

@@ -1,6 +1,7 @@
 pub mod users;
 pub mod log;
-pub mod purchase_order;
+pub mod party;
+pub mod bill_of_material;
 pub mod incoming_steel;
 
 use axum::{Router, Extension};
@@ -8,8 +9,9 @@ use std::sync::Arc;
 
 use crate::service::DbService;
 use crate::routes::users::create_user_routes;
-use crate::routes::purchase_order::create_purchase_order_routes;
 use crate::routes::log::create_log_routes;
+use crate::routes::party::create_party_routes;
+use crate::routes::bill_of_material::create_bill_of_material_routes;
 use crate::routes::incoming_steel::create_incoming_steel_routes;
 
 
@@ -21,7 +23,8 @@ pub async fn create_routes() -> Router {
     let routes = Router::new()
     .nest("/users/", create_user_routes().await)
     .nest("/log/", create_log_routes().await)
-    .nest("/purchase_order/", create_purchase_order_routes().await)
+    .nest("/party/", create_party_routes().await)
+    .nest("/bill_of_material/", create_bill_of_material_routes().await)
     .nest("/incoming_steel/", create_incoming_steel_routes().await)
     .layer(Extension(client));
 

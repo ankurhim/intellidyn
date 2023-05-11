@@ -6,7 +6,7 @@ pub mod find_incoming;
 
 use axum::{
     Router,
-    routing::{get, post, delete},
+    routing::{get, post},
 };
 
 use self::{
