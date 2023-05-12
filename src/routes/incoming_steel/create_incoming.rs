@@ -17,7 +17,6 @@ pub struct CreateIncomingSteelRequest {
     pub heat_no: String,
     pub heat_code: Option<String>,
     pub jominy_value: Option<String>,
-    pub opening_qty: i64,
     pub received_qty: i64,
     pub remarks: Option<String>
 }
@@ -32,7 +31,7 @@ impl CreateIncomingSteelRequest {
             "CREATE TABLE IF NOT EXISTS mwspl_incoming_steel_table(
                 id SERIAL NOT NULL,
                 incoming_steel_pk TEXT NOT NULL,
-                challan_no TEXT NOT NULL PRIMARY KEY,
+                challan_no TEXT NOT NULL,
                 challan_date DATE NOT NULL,
                 grade TEXT NOT NULL,
                 section BIGINT NOT NULL,
@@ -40,7 +39,6 @@ impl CreateIncomingSteelRequest {
                 heat_no TEXT NOT NULL,
                 heat_code TEXT,
                 jominy_value TEXT,
-                opening_qty BIGINT NOT NULL,
                 received_qty BIGINT NOT NULL,
                 issued_qty BIGINT NOT NULL,
                 actual_qty BIGINT NOT NULL,
@@ -52,7 +50,8 @@ impl CreateIncomingSteelRequest {
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
                 remarks TEXT,
-                UNIQUE (challan_no, grade, section, section_type, heat_no)
+                UNIQUE (challan_no, heat_no, grade, section, section_type),
+                CONSTRAINT pk_steel PRIMARY KEY(challan_no, grade, section, section_type, heat_no)
             );",
             &[]
         )
@@ -118,7 +117,6 @@ impl CreateIncomingSteelRequest {
                 heat_no,
                 heat_code,
                 jominy_value,
-                opening_qty,
                 received_qty,
                 issued_qty,
                 actual_qty,
@@ -130,7 +128,7 @@ impl CreateIncomingSteelRequest {
                 modified_on,
                 modified_login_key,
                 remarks
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,$17, $18, $19, $20, $21)",
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,$17, $18, $19, $20)",
             &[
                 &Uuid::new_v4().to_string(),
                 &payload.challan_no,
@@ -141,10 +139,8 @@ impl CreateIncomingSteelRequest {
                 &payload.heat_no,
                 &payload.heat_code,
                 &payload.jominy_value,
-                &payload.opening_qty,
                 &payload.received_qty,
-                &0_i64,
-                &(payload.opening_qty + payload.received_qty),
+                &payload.received_qty,
                 &None::<String>,
                 &user,
                 &Local::now(),

@@ -14,7 +14,6 @@ pub struct IncomingSteel {
     pub heat_no: String,
     pub heat_code: Option<String>,
     pub jominy_value: Option<String>,
-    pub opening_qty: i64,
     pub received_qty: i64,
     pub issued_qty: i64,
     pub actual_qty: i64,

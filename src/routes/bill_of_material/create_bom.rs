@@ -44,7 +44,7 @@ impl CreateBillOfMaterialRequest {
                 purchase_order_pk TEXT NOT NULL,
                 purchase_order_no TEXT NOT NULL PRIMARY KEY,
                 po_date DATE NOT NULL,
-                party_id TEXT NOT NULL REFERENCES mwspl_party_table(party_id)ON UPDATE CASCADE ON DELETE NO ACTION,
+                party_id TEXT NOT NULL REFERENCES mwspl_party_table(party_id) ON UPDATE CASCADE ON DELETE NO ACTION,
                 po_quantity BIGINT,
                 po_received_date DATE,
                 po_effective_date DATE,

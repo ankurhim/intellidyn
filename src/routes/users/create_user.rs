@@ -34,7 +34,7 @@ impl CreateUserRequest {
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
 
-        let create_user_table = service.client
+        match service.client
         .execute(
             "CREATE TABLE IF NOT EXISTS mwspl_user_table (
                 id SERIAL NOT NULL,
@@ -53,16 +53,8 @@ impl CreateUserRequest {
             );", &[]
         )
         .await
-        .map(|val| Json(json!(CreateUserResponse {
-            data: Some(format!("{:?}", val)),
-            error: None,
-        })))
-        .map_err(|e| Json(json!(CreateUserResponse {
-            data: None,
-            error: Some(e.to_string())
-        })));
-
-        match create_user_table {
+        .map(|val| Json(json!(val)))
+        .map_err(|e| Json(json!(e.to_string()))) {
             Ok(v) => v,
             Err(e) => e
         }

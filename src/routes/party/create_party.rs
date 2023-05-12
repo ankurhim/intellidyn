@@ -13,6 +13,10 @@ pub struct CreatePartyRequest {
     pub party_type: String,
     pub party_name: String,
     pub party_address: String,
+    pub gstn: String,
+    pub contact_person: Option<String>,
+    pub email_id: Option<String>,
+    pub contact_no: Option<String>,
     pub remarks: Option<String>
 }
 
@@ -29,6 +33,10 @@ impl CreatePartyRequest {
                 party_id TEXT NOT NULL PRIMARY KEY,
                 party_type TEXT NOT NULL,
                 party_name TEXT NOT NULL,
+                gstn TEXT NOT NULL,
+                contact_person TEXT,
+                email_id TEXT,
+                contact_no TEXT,
                 created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 created_on TIMESTAMPTZ NOT NULL,
                 created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -36,7 +44,7 @@ impl CreatePartyRequest {
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
                 remarks TEXT,
-                UNIQUE (party_id)
+                UNIQUE (party_id, gstn)
             );",
             &[]
         )
@@ -96,6 +104,10 @@ impl CreatePartyRequest {
                 party_type,
                 party_name,
                 party_address,
+                gstn,
+                contact_person,
+                email_id,
+                contact_no
                 created_by,
                 created_on,
                 created_login_key,
@@ -111,6 +123,10 @@ impl CreatePartyRequest {
                 &payload.party_type,
                 &payload.party_name,
                 &payload.party_address,
+                &payload.gstn,
+                &payload.contact_person,
+                &payload.email_id,
+                &payload.contact_no,
                 &user,
                 &Local::now(),
                 &login_key,
