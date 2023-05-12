@@ -17,5 +17,7 @@ pub async fn create_log_routes() -> Router {
     .route("/create_log_table", post(CreateLogRequest::create_log_table))
     .route("/delete_log_table", post(CreateLogRequest::drop_log_table))
     .route("/:username/:login_key/find_all_logs", get(FindLogRequest::find_logs))
+    .route("/:username/:login_key/find_all_logs_by_username", get(FindLogRequest::find_logs_by_username))
+    .route("/:username/:login_key/find_all_logs_by_username_filter_by_date", post(FindLogRequest::find_logs_by_username_filter_by_date))
     .route("/:username/:login_key/find_active_log_by_username", get(FindLogRequest::find_active_log_by_username))
 }

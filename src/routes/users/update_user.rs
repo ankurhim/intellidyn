@@ -1,11 +1,13 @@
 use serde::{Serialize, Deserialize };
+use uuid::Uuid;
 use std::sync::Arc;
-use bcrypt::{hash, DEFAULT_COST};
 use axum::{
     Extension,
     Json,
+    extract::{Query, Path}
 };
-
+use chrono::{DateTime, Local};
+use bcrypt::{hash, DEFAULT_COST};
 use serde_json::{Value, json};
 
 use crate::routes::users::user_model::User;
@@ -13,45 +15,40 @@ use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UpdateUserRequest {
-    pub username: String,
     pub password: String
 }
 
-#[derive(Debug, Serialize)]
-pub struct UpdateUserResponse {
-    pub success: bool,
-    pub data: Option<String>,
-    pub error: Option<String>
-}
-
 impl UpdateUserRequest {
-    pub async fn update_user_by_username(
-        Extension(logged_user): Extension<Arc<User>>,
+    pub async fn change_password(
+        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
-        Json(query): Json<UpdateUserRequest>,
+        Json(payload): Json<UpdateUserRequest>,
     ) -> Json<Value> {
+
         let resp = service.client
-        .execute(
-            "UPDATE intellidyn_user SET password = $2, modified_by = $3, modified_on = $4 WHERE username = $1;", &[
-                &query.username,
-                &hash(query.password, DEFAULT_COST).expect("Hashing failed"),
-                &logged_user.username,
-                &Some(std::time::SystemTime::now())
-                ]
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
         )
         .await
-        .map(|val| Json(json!(UpdateUserResponse {
-            success: true,
-            data: Some(format!("{:?}", val)),
-            error: None,
-        })))
-        .map_err(|e| Json(json!(UpdateUserResponse {
-            success: false,
-            data: None,
-            error: Some(e.to_string())
-        })));
+        .map_err(|e| Json(json!(e.to_string())));
 
-        match resp {
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+
+        let hash = hash(&payload.password, DEFAULT_COST).expect("Hashing failed");
+
+        match service.client
+        .execute(
+            "UPDATE mwspl_user_table SET password = $2 WHERE username = $1", &[&user, &hash]
+        )
+        .await
+        .map(|val| Json(json!(val)))
+        .map_err(|e| Json(json!(e.to_string()))) {
             Ok(v) => v,
             Err(e) => e
         }

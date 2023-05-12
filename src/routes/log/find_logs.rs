@@ -6,7 +6,7 @@ use axum::{
     Json,
     extract::{Query, Path}
 };
-use chrono::{DateTime, Local};
+use chrono::{DateTime, NaiveDate ,Local};
 
 use serde_json::{Value, json};
 
@@ -18,10 +18,10 @@ pub struct FindLogRequest {
     pub username: Option<String>
 }
 
-#[derive(Debug, Serialize)]
-pub struct FindLogResponse {
-    pub data: Vec<Log>,
-    pub error: Option<String>
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DateFilterRequest {
+    pub start_date: String,
+    pub end_date: String
 }
 
 impl FindLogRequest {
@@ -49,6 +49,94 @@ impl FindLogRequest {
         let resp = service.client
         .query(
             "SELECT * FROM mwspl_log_table", &[]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            log_vector.push(Log {
+                log_pk: Uuid::parse_str(row.get(1)).unwrap(),
+                username: row.get(2),
+                login_key: row.get(3),
+                login_time: row.get(4),
+                logout_time: row.get(5),
+                remarks: row.get(6)
+            })
+        }
+
+        Json(json!(log_vector))
+    }
+
+    pub async fn find_logs_by_username(
+        Path((user, login_key)): Path<(String, String)>,
+        Extension(service): Extension<Arc<DbService>>,
+    ) -> Json<Value> {
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+
+        let mut log_vector: Vec<Log> = Vec::new();
+
+        let resp = service.client
+        .query(
+            "SELECT * FROM mwspl_log_table WHERE username = $1 ORDER BY login_time ASC;", &[&user]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            log_vector.push(Log {
+                log_pk: Uuid::parse_str(row.get(1)).unwrap(),
+                username: row.get(2),
+                login_key: row.get(3),
+                login_time: row.get(4),
+                logout_time: row.get(5),
+                remarks: row.get(6)
+            })
+        }
+
+        Json(json!(log_vector))
+    }
+
+    pub async fn find_logs_by_username_filter_by_date(
+        Path((user, login_key)): Path<(String, String)>,
+        Extension(service): Extension<Arc<DbService>>,
+        Json(payload): Json<DateFilterRequest>,
+    ) -> Json<Value> {
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+
+        let mut log_vector: Vec<Log> = Vec::new();
+
+        let start_date = NaiveDate::parse_from_str(&payload.start_date, "%Y-%m-%dT%H:%M:%S").expect("Date parsing error");
+        let end_date = NaiveDate::parse_from_str(&payload.end_date, "%Y-%m-%dT%H:%M:%S").expect("Date parsing error");
+
+        let resp = service.client
+        .query(
+            "SELECT * FROM mwspl_log_table WHERE username = $1 AND login_time BETWEEN $2 :: DATE AND $3 :: DATE ORDER BY login_time ASC;", &[&user, &start_date, &end_date]
         )
         .await
         .map_err(|e| Json(json!(e.to_string())));
