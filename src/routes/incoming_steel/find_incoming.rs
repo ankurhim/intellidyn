@@ -73,18 +73,17 @@ impl FindIncomingSteelRequest {
                 heat_no:row.get(7),
                 heat_code:row.get(8),
                 jominy_value:row.get(9),
-                opening_qty:row.get(10),
-                received_qty:row.get(11),
-                issued_qty:row.get(12),
-                actual_qty:row.get(13),
-                heat_status:row.get(14),
-                created_by: row.get(15),
-                created_on: row.get(16),
-                created_login_key: row.get(17),
-                modified_by: row.get(18),
-                modified_on: row.get(19),
-                modified_login_key: row.get(20),
-                remarks: row.get(21)
+                received_qty:row.get(10),
+                issued_qty:row.get(11),
+                actual_qty:row.get(12),
+                heat_status:row.get(13),
+                created_by: row.get(14),
+                created_on: row.get(15),
+                created_login_key: row.get(16),
+                modified_by: row.get(17),
+                modified_on: row.get(18),
+                modified_login_key: row.get(19),
+                remarks: row.get(20)
             })
         };
         match &steel_vector.len() {
@@ -132,18 +131,17 @@ impl FindIncomingSteelRequest {
                 heat_no:row.get(7),
                 heat_code:row.get(8),
                 jominy_value:row.get(9),
-                opening_qty:row.get(10),
-                received_qty:row.get(11),
-                issued_qty:row.get(12),
-                actual_qty:row.get(13),
-                heat_status:row.get(14),
-                created_by: row.get(15),
-                created_on: row.get(16),
-                created_login_key: row.get(17),
-                modified_by: row.get(18),
-                modified_on: row.get(19),
-                modified_login_key: row.get(20),
-                remarks: row.get(21)
+                received_qty:row.get(10),
+                issued_qty:row.get(11),
+                actual_qty:row.get(12),
+                heat_status:row.get(13),
+                created_by: row.get(14),
+                created_on: row.get(15),
+                created_login_key: row.get(16),
+                modified_by: row.get(17),
+                modified_on: row.get(18),
+                modified_login_key: row.get(19),
+                remarks: row.get(20)
             })
         };
         match &steel_vector.len() {

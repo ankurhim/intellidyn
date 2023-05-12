@@ -13,5 +13,6 @@ pub struct ApprovedComponent {
     pub created_by: Option<String>,
     pub created_on: std::time::SystemTime,
     pub modified_by: Option<String>,
-    pub modified_on: Option<std::time::SystemTime>
+    pub modified_on: Option<std::time::SystemTime>,
+    pub remarks: Option<String>
 }
