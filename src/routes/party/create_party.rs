@@ -33,6 +33,7 @@ impl CreatePartyRequest {
                 party_id TEXT NOT NULL PRIMARY KEY,
                 party_type TEXT NOT NULL,
                 party_name TEXT NOT NULL,
+                party_address TEXT NOT NULL,
                 gstn TEXT NOT NULL,
                 contact_person TEXT,
                 email_id TEXT,
@@ -107,7 +108,7 @@ impl CreatePartyRequest {
                 gstn,
                 contact_person,
                 email_id,
-                contact_no
+                contact_no,
                 created_by,
                 created_on,
                 created_login_key,
@@ -115,10 +116,9 @@ impl CreatePartyRequest {
                 modified_on,
                 modified_login_key,
                 remarks
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
             &[
                 &Uuid::new_v4().to_string(),
-                &payload.party_id,
                 &payload.party_id,
                 &payload.party_type,
                 &payload.party_name,

@@ -42,7 +42,7 @@ impl CreateBillOfMaterialRequest {
             "CREATE TABLE IF NOT EXISTS mwspl_bill_of_material_table(
                 id SERIAL NOT NULL,
                 purchase_order_pk TEXT NOT NULL,
-                purchase_order_no TEXT NOT NULL PRIMARY KEY,
+                purchase_order_no TEXT NOT NULL,
                 po_date DATE NOT NULL,
                 party_id TEXT NOT NULL REFERENCES mwspl_party_table(party_id) ON UPDATE CASCADE ON DELETE NO ACTION,
                 po_quantity BIGINT,
@@ -69,7 +69,7 @@ impl CreateBillOfMaterialRequest {
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
                 remarks TEXT,
-                UNIQUE (purchase_order_no, party_id, part_no)
+                UNIQUE (purchase_order_no, party_id, part_no, po_status)
             );",
             &[]
         )
@@ -170,8 +170,8 @@ impl CreateBillOfMaterialRequest {
             &[
                 &Uuid::new_v4().to_string(),
                 &payload.purchase_order_no,
-                &po_date,
                 &payload.party_id,
+                &po_date,
                 &payload.po_quantity,
                 &po_received_date,
                 &po_effective_date,

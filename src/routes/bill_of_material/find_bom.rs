@@ -158,8 +158,8 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
         vector.push(BillOfMaterial {
             purchase_order_pk: Uuid::parse_str(row.get(1)).unwrap(),
             purchase_order_no: row.get(2),
-            party_id: row.get(3),
-            po_date: row.get(4),
+            po_date: row.get(3),
+            party_id: row.get(4),
             po_quantity: row.get(5),
             po_received_date: row.get(6),
             po_effective_date: row.get(7),
