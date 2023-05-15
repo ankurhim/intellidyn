@@ -29,7 +29,7 @@ impl CreateIncomingSteelRequest {
         match service.client
         .execute(
             "CREATE TABLE IF NOT EXISTS mwspl_incoming_steel_table(
-                id SERIAL NOT NULL,
+                id SERIAL NOT NULL PRIMARY KEY,
                 incoming_steel_pk TEXT NOT NULL,
                 challan_no TEXT NOT NULL,
                 challan_date DATE NOT NULL,
@@ -41,7 +41,7 @@ impl CreateIncomingSteelRequest {
                 jominy_value TEXT,
                 received_qty BIGINT NOT NULL,
                 issued_qty BIGINT NOT NULL,
-                actual_qty BIGINT NOT NULL,
+                available_qty BIGINT NOT NULL,
                 heat_status TEXT,
                 created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 created_on TIMESTAMPTZ NOT NULL,
@@ -50,8 +50,7 @@ impl CreateIncomingSteelRequest {
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
                 remarks TEXT,
-                UNIQUE (challan_no, heat_no, grade, section, section_type),
-                CONSTRAINT pk_steel PRIMARY KEY(challan_no, grade, section, section_type, heat_no)
+                UNIQUE (challan_no, heat_no, grade, section, section_type)
             );",
             &[]
         )
@@ -119,7 +118,7 @@ impl CreateIncomingSteelRequest {
                 jominy_value,
                 received_qty,
                 issued_qty,
-                actual_qty,
+                available_qty,
                 heat_status,
                 created_by,
                 created_on,
@@ -140,7 +139,8 @@ impl CreateIncomingSteelRequest {
                 &payload.heat_code,
                 &payload.jominy_value,
                 &payload.received_qty,
-                &payload.received_qty,
+                &0_i64,
+                &(payload.received_qty - 0_i64),
                 &None::<String>,
                 &user,
                 &Local::now(),
