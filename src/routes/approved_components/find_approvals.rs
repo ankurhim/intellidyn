@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
-
+use tokio_postgres::Row;
 use axum::{
     Extension,
     Json,
@@ -29,7 +29,7 @@ impl FindApprovedHeatsRequest {
     pub async fn find_approved_heats(
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
-    ) -> Result<Json<Value>, AppError> {
+    ) -> Json<Value> {
         let mut part_vector: Vec<ApprovedComponent> = Vec::new();
 
         let resp = service.client
@@ -37,64 +37,52 @@ impl FindApprovedHeatsRequest {
             "SELECT * FROM mwspl_approved_component_table", &[]
         )
         .await
-        .map_err(|e|{
-            dbg!(e);
-            AppError::InternalServerError
-        })?;
+        .map_err(|e| Json(json!(e.to_string())));
 
-        for row in resp {
-            part_vector.push(ApprovedComponent {
-                approval_pk: Uuid::parse_str(row.get(1)).unwrap(),
-                heat_no: row.get(2),
-                grade: row.get(3),
-                section: row.get(4),
-                section_type: row.get(5),
-                approved_part: row.get(6),
-                created_by: row.get(7),
-                created_on: row.get(8),
-                created_login_key: row.get(9),
-                modified_by: row.get(10),
-                modified_on: row.get(11),
-                modified_login_key: row.get(12),
-                remarks: row.get(13)
-            })
-        }
-
-        Ok(Json(json!(part_vector)))
+        get_list(resp.unwrap())
     }
 
-    // pub async fn find_approved_heats_by_filter(
-    //     Extension(_logged_user): Extension<Arc<User>>,
-    //     Extension(service): Extension<Arc<DbService>>,
-    //     Query(query): Query<FindApprovedHeatsRequest>,
-    // ) -> Result<Json<Value>, AppError> {
-    //     let mut part_vector: Vec<ApprovedComponent> = Vec::new();
+    pub async fn find_approved_heats_by_filter(
+        Path((user, login_key)): Path<(String, String)>,
+        Extension(service): Extension<Arc<DbService>>,
+        Query(query): Query<FindApprovedHeatsRequest>,
+    ) -> Json<Value> {
+        let mut part_vector: Vec<ApprovedComponent> = Vec::new();
 
-    //     let resp = service.client
-    //     .query(
-    //         "SELECT * FROM mwspl_approved_component_table WHERE heat_no = $1 OR approved_part = $1", &[&query.filter]
-    //     )
-    //     .await
-    //     .map_err(|e|{
-    //         dbg!(e);
-    //         AppError::InternalServerError
-    //     })?;
+        let resp = service.client
+        .query(
+            "SELECT * FROM mwspl_approved_component_table WHERE heat_no = $1 OR approved_part = $1", &[&query.filter]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
 
-    //     for row in resp {
-    //         part_vector.push(ApprovedComponent {
-    //             approval_pk: Uuid::parse_str(row.get(1)).unwrap(),
-    //             heat_no: row.get(2),
-    //             grade: row.get(3),
-    //             section: row.get(4),
-    //             section_type: row.get(5),
-    //             approved_part: row.get(6),
-    //             created_by: row.get(7),
-    //             created_on: row.get(8),
-    //             modified_by: row.get(9),
-    //             modified_on: row.get(10)
-    //         })
-    //     }
+        get_list(resp.unwrap())
+    }
+}
 
-    //     Ok(Json(json!(part_vector)))
-    // }
+fn get_list(row_vector: Vec<Row>) -> Json<Value> {
+    
+    let mut vector: Vec<ApprovedComponent> = Vec::new();
+    
+    for row in row_vector {
+        vector.push(ApprovedComponent {
+            approval_pk: Uuid::parse_str(row.get(1)).unwrap(),
+            heat_no: row.get(2),
+            grade: row.get(3),
+            section: row.get(4),
+            section_type: row.get(5),
+            approved_part: row.get(6),
+            created_by: row.get(7),
+            created_on: row.get(8),
+            created_login_key: row.get(9),
+            modified_by: row.get(10),
+            modified_on: row.get(11),
+            modified_login_key: row.get(12),
+            remarks: row.get(13)
+        })
+    };
+    match &vector.len() {
+        0 => Json(json!(None::<Vec<ApprovedComponent>>)),
+        _ => Json(json!(vector))
+    }
 }
