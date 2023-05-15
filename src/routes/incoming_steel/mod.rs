@@ -1,8 +1,7 @@
 pub mod incoming_steel_model;
 pub mod create_incoming;
 pub mod find_incoming;
-// pub mod inventory;
-// pub mod delete_incoming;
+pub mod inventory;
 
 use axum::{
     Router,
@@ -12,8 +11,7 @@ use axum::{
 use self::{
     create_incoming::CreateIncomingSteelRequest,
     find_incoming::FindIncomingSteelRequest,
-    // inventory::{ FindInventoryRequest, FindInventoryByDateRangeRequest },
-    // delete_incoming::DeleteIncomingSteelRequest,
+    inventory::Inventory
 };
 
 pub async fn create_incoming_steel_routes() -> Router {
@@ -23,4 +21,7 @@ pub async fn create_incoming_steel_routes() -> Router {
     .route("/:user/:login_key/create_new_incoming_steel", post(CreateIncomingSteelRequest::create_new_incoming_steel))
     .route("/:user/:login_key/find_all_incoming_steels", get(FindIncomingSteelRequest::find_all_incoming_steels))
     .route("/:user/:login_key/find_all_incoming_steels_by_filter", get(FindIncomingSteelRequest::find_all_incoming_steels_by_filter))
+    .route("/:user/:login_key/fetch_inventory", get(Inventory::fetch_inventory))
+    .route("/:user/:login_key/fetch_inventory_by_filter", get(Inventory::fetch_inventory_by_filter))
+    .route("/:user/:login_key/fetch_inventory_filtered_by_date", get(Inventory::fetch_inventory_filtered_by_date))
 }
