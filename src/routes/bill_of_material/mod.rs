@@ -23,5 +23,6 @@ pub async fn create_bill_of_material_routes() -> Router {
     .route("/:user/:login_key/find_all_bill_of_materials_by_dwg_no", get(FindBillOfMaterialRequest::find_all_boms_by_dwg_no))
     .route("/:user/:login_key/find_active_bill_of_materials", get(FindBillOfMaterialRequest::find_active_boms))
     .route("/:user/:login_key/find_active_bill_of_materials_by_dwg_no", get(FindBillOfMaterialRequest::find_active_boms_by_dwg_no))
+    .route("/:user/:login_ket/find_all_dwg_no", get(FindBillOfMaterialRequest::find_all_dwg_no))
     .route("/:user/:login_key/update_po_status_by_filter", put(UpdateBillOfMaterialRequest::update_bom_status_by_filter))
 }

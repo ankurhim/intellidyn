@@ -69,7 +69,7 @@ impl CreateBillOfMaterialRequest {
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
                 remarks TEXT,
-                UNIQUE (purchase_order_no, party_id, part_no, po_status)
+                UNIQUE (purchase_order_no, party_id, part_no, drawing_no, po_status)
             );",
             &[]
         )

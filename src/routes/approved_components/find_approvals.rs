@@ -30,7 +30,6 @@ impl FindApprovedHeatsRequest {
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
-        let mut part_vector: Vec<ApprovedComponent> = Vec::new();
 
         let resp = service.client
         .query(
@@ -47,7 +46,6 @@ impl FindApprovedHeatsRequest {
         Extension(service): Extension<Arc<DbService>>,
         Query(query): Query<FindApprovedHeatsRequest>,
     ) -> Json<Value> {
-        let mut part_vector: Vec<ApprovedComponent> = Vec::new();
 
         let resp = service.client
         .query(
