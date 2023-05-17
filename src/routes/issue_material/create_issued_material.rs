@@ -2,11 +2,14 @@ use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
 use chrono::{ DateTime, Local, NaiveDate };
-use axum::{Extension, Json, extract::{Path}};
+use axum::{Extension, Json, extract::{Path, Query}};
 use serde_json::{Value, json};
+use std::ops::Deref;
 
 use crate::service::DbService;
 use crate::routes::incoming_steel::update_incoming::UpdateInventoryRequest;
+use crate::routes::cutting_store::find_cutting_inventory::FindCuttingInventoryRequest;
+use crate::routes::cutting_store::cutting_store_model::CuttingMaterial;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateMaterialIssueRequest {
@@ -85,7 +88,7 @@ impl CreateMaterialIssueRequest {
                 return Json(json!("You are logged out"));
             }
         }
-
+        
         match service.client
         .execute(
             "INSERT INTO mwspl_material_issue_table(
@@ -124,8 +127,8 @@ impl CreateMaterialIssueRequest {
             Json(json!(val))
         })
         .map_err(|e| Json(json!(e.to_string()))) {
-            Ok(v) => v.await,
-            Err(e) => e
+            Ok(v) => { return v.await; },
+            Err(e) => { return e; }
         }
     }
 }
