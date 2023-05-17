@@ -182,6 +182,41 @@ impl FindBillOfMaterialRequest {
 
         Json(json!(part_list))
     }
+
+    pub async fn find_by_dwg_no(
+        Path((user, login_key)): Path<(String, String)>,
+        Extension(service): Extension<Arc<DbService>>,
+        Query(dwg_no): Query<String>
+    ) -> Json<Value> {
+
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+        
+        let resp = service.client
+        .query("SELECT DISTINCT drawing_no, gross_weight, cut_weight FROM mwspl_bom_table WHERE drawing_no = $1 AND po_status = 'ACTIVE';", &[&dwg_no])
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        let mut part_list: Vec<(String, f64, f64)> = Vec::new();
+
+        for row in resp.unwrap() {
+            part_list.push((row.get(0), row.get(1), row.get(2)))
+        }
+
+        Json(json!(part_list))
+    }
 }
 
 fn get_list(row_vector: Vec<Row>) -> Json<Value> {

@@ -2,6 +2,7 @@ pub mod incoming_steel_model;
 pub mod create_incoming;
 pub mod find_incoming;
 pub mod inventory;
+pub mod update_incoming;
 
 use axum::{
     Router,
@@ -11,7 +12,7 @@ use axum::{
 use self::{
     create_incoming::CreateIncomingSteelRequest,
     find_incoming::FindIncomingSteelRequest,
-    inventory::Inventory
+    inventory::Inventory,
 };
 
 pub async fn create_incoming_steel_routes() -> Router {

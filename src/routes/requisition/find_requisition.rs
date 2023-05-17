@@ -14,7 +14,7 @@ use crate::service::DbService;
 use crate::routes::requisition::requisition_model::Requisition;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FindREquisitionRequest {
+pub struct FindRequisitionRequest {
     pub filter: Option<String>
 }
 
@@ -63,10 +63,10 @@ impl FindRequisitionRequest {
         get_list(resp.unwrap())
     }
 
-    pub async fn find_all_boms_by_sender(
+    pub async fn find_all_requisitions_by_sender(
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
-        Query(payload): Query<FindBillOfMaterialRequest>
+        Query(payload): Query<FindRequisitionRequest>
     ) -> Json<Value> {
 
         let resp = service.client
@@ -92,10 +92,10 @@ impl FindRequisitionRequest {
         get_list(resp.unwrap())
     }
 
-    pub async fn find_active_requisitions(
+    pub async fn find_all_requisitions_by_receiver(
         Path((user, login_key)): Path<(String, String)>,
-        Extension(service): Extension<Arc<DbService>>,        
-        Query(payload): Query<FindBillOfMaterialRequest>
+        Extension(service): Extension<Arc<DbService>>,
+        Query(payload): Query<FindRequisitionRequest>
     ) -> Json<Value> {
 
         let resp = service.client
@@ -114,17 +114,17 @@ impl FindRequisitionRequest {
         }
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_bom_table WHERE request_from = $1 AND status = 'OPEN';", &[&payload.filter])
+        .query("SELECT * FROM mwspl_requisition_table WHERE request_to = $1 AND status = 'OPEN';", &[&payload.filter])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
         get_list(resp.unwrap())
     }
 
-    pub async fn find_active_boms_by_dwg_no(
+    pub async fn find_open_requisitions(
         Path((user, login_key)): Path<(String, String)>,
-        Extension(service): Extension<Arc<DbService>>,
-        Query(payload): Query<FindBillOfMaterialRequest>
+        Extension(service): Extension<Arc<DbService>>,        
+        Query(payload): Query<FindRequisitionRequest>
     ) -> Json<Value> {
 
         let resp = service.client
@@ -143,7 +143,7 @@ impl FindRequisitionRequest {
         }
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_bom_table WHERE drawing_no = $1 AND po_status = 'ACTIVE';", &[&payload.filter])
+        .query("SELECT * FROM mwspl_requisition_table WHERE request_from = $1 AND status = 'OPEN';", &[&payload.filter])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
@@ -156,7 +156,7 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
     let mut vector: Vec<Requisition> = Vec::new();
     
     for row in row_vector {
-        vector.push(Requistion {
+        vector.push(Requisition {
             requisition_pk: row.get(1),
             request_from: row.get(2),
             request_to: row.get(3),
@@ -174,7 +174,7 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
         })
     };
     match &vector.len() {
-        0 => Json(json!(None::<Vec<Requistion>>)),
+        0 => Json(json!(None::<Vec<Requisition>>)),
         _ => Json(json!(vector))
     }
 }
