@@ -38,7 +38,7 @@ impl FindCuttingInventoryRequest {
 
         let service_resp = service.client
         .query(
-            "SELECT * FROM mwspl_cutting_inventory_table WHERE batch_status = 'NOT ISSUED';",
+            "SELECT * FROM mwspl_cutting_inventory_table WHERE batch_status = 'NOT ISSUED' ORDER BY cutting_date;",
             &[]
         )
         .await
@@ -70,7 +70,7 @@ impl FindCuttingInventoryRequest {
 
         let service_resp = service.client
         .query(
-            "SELECT * FROM mwspl_cutting_inventory_table WHERE drawing_no = $1 AND batch_status = 'NOT ISSUED';",
+            "SELECT * FROM mwspl_cutting_inventory_table WHERE drawing_no = $1 AND batch_status = 'NOT ISSUED' ORDER BY cutting_date;",
             &[&query.drawing_no]
         )
         .await
