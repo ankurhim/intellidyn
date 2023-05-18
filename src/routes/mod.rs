@@ -30,7 +30,6 @@ use crate::routes::{
     fg_material::create_fg_material_routes,
 };
 
-
 pub async fn create_routes() -> Router {
     let client = Arc::new(DbService::new()
     .await
