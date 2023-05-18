@@ -8,8 +8,7 @@ use std::ops::Deref;
 
 use crate::service::DbService;
 use crate::routes::incoming_steel::update_incoming::UpdateInventoryRequest;
-use crate::routes::cutting_store::find_cutting_inventory::FindCuttingInventoryRequest;
-use crate::routes::cutting_store::cutting_store_model::CuttingMaterial;
+use crate::routes::cutting_material::find_cutting_material::FindCuttingMaterialRequest;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateMaterialIssueRequest {

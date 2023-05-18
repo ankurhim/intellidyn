@@ -6,7 +6,10 @@ pub mod incoming_steel;
 pub mod approved_components;
 pub mod requisition;
 pub mod issue_material;
-pub mod cutting_store;
+pub mod cutting_material;
+pub mod forging_material;
+pub mod ht_material;
+pub mod fg_material;
 
 use axum::{Router, Extension};
 use std::sync::Arc;
@@ -21,7 +24,10 @@ use crate::routes::{
     approved_components::create_approved_component_routes,
     requisition::create_requisition_routes,
     issue_material::create_material_issue_routes,
-    cutting_store::create_cutting_inventory_routes,
+    cutting_material::create_cutting_material_routes,
+    forging_material::create_forging_material_routes,
+    ht_material::create_ht_material_routes,
+    fg_material::create_fg_material_routes,
 };
 
 
@@ -39,7 +45,10 @@ pub async fn create_routes() -> Router {
     .nest("/part_approvals/", create_approved_component_routes().await)
     .nest("/requisition/", create_requisition_routes().await)
     .nest("/material_issue/", create_material_issue_routes().await)
-    .nest("/cutting_store", create_cutting_inventory_routes().await)
+    .nest("/cutting_material/", create_cutting_material_routes().await)
+    .nest("/forging_material/", create_forging_material_routes().await)
+    .nest("/ht_material/", create_ht_material_routes().await)
+    .nest("/fg_material/",create_fg_material_routes().await)
     .layer(Extension(client));
 
     routes

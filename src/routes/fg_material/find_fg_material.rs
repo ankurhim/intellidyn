@@ -7,18 +7,18 @@ use serde_json::{Value, json};
 use tokio_postgres::Row;
 use crate::service::DbService;
 
-use crate::routes::cutting_store::cutting_store_model::CuttingMaterial;
+use crate::routes::fg_material::fg_material_model::FGMaterial;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FindCuttingInventoryRequest {
+pub struct FindFGMaterialRequest {
     pub drawing_no: Option<String>,
 }
 
-impl FindCuttingInventoryRequest {
-    pub async fn find_cutting_inventory(
+impl FindFGMaterialRequest {
+    pub async fn find_fg_material(
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
-        Query(query): Query<FindCuttingInventoryRequest>
+        Query(query): Query<Self>
     ) -> Json<Value> {
 
         let resp = service.client
@@ -38,7 +38,7 @@ impl FindCuttingInventoryRequest {
 
         let service_resp = service.client
         .query(
-            "SELECT * FROM mwspl_cutting_inventory_table WHERE batch_status = 'NOT ISSUED' ORDER BY cutting_date;",
+            "SELECT * FROM mwspl_fg_material_table WHERE batch_status = 'NOT ISSUED' ORDER BY fg_date;",
             &[]
         )
         .await
@@ -47,10 +47,10 @@ impl FindCuttingInventoryRequest {
         get_list(service_resp.unwrap())
     }
 
-    pub async fn find_cutting_inventory_by_dwg_no(
+    pub async fn find_fg_material_by_dwg_no(
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
-        Query(query): Query<FindCuttingInventoryRequest>,
+        Query(query): Query<Self>,
     ) -> Json<Value> {
 
         let resp = service.client
@@ -70,7 +70,7 @@ impl FindCuttingInventoryRequest {
 
         let service_resp = service.client
         .query(
-            "SELECT * FROM mwspl_cutting_inventory_table WHERE drawing_no = $1 AND batch_status = 'NOT ISSUED' ORDER BY cutting_date;",
+            "SELECT * FROM mwspl_fg_material_table WHERE drawing_no = $1 AND batch_status = 'NOT ISSUED' ORDER BY fg_date;",
             &[&query.drawing_no]
         )
         .await
@@ -82,33 +82,32 @@ impl FindCuttingInventoryRequest {
 
 fn get_list(row_vector: Vec<Row>) -> Json<Value> {
     
-    let mut vector: Vec<CuttingMaterial> = Vec::new();
+    let mut vector: Vec<FGMaterial> = Vec::new();
     
     for row in row_vector {
-        vector.push(CuttingMaterial {
-            cutting_store_pk: Uuid::parse_str(row.get(1)).unwrap(),
-            cutting_date: row.get(2),
+        vector.push(FGMaterial {
+            fg_material_pk: Uuid::parse_str(row.get(1)).unwrap(),
+            fg_date: row.get(2),
             drawing_no: row.get(3),
             available_qty: row.get(4),
             heat_no: row.get(5),
             grade: row.get(6),
             section: row.get(7),
             section_type: row.get(8),
-            gross_weight: row.get(9),
-            cut_weight: row.get(10),
-            quality_status: row.get(11),
-            batch_status: row.get(12),
-            created_by: row.get(13),
-            created_on: row.get(14),
-            created_login_key: row.get(15),
-            modified_by: row.get(16),
-            modified_on: row.get(17),
-            modified_login_key: row.get(18),
-            remarks: row.get(19)
+            forging_weight: row.get(9),
+            quality_status: row.get(10),
+            batch_status: row.get(11),
+            created_by: row.get(12),
+            created_on: row.get(13),
+            created_login_key: row.get(14),
+            modified_by: row.get(15),
+            modified_on: row.get(16),
+            modified_login_key: row.get(17),
+            remarks: row.get(18)
         })
     };
     match &vector.len() {
-        0 => Json(json!(None::<Vec<CuttingMaterial>>)),
+        0 => Json(json!(None::<Vec<FGMaterial>>)),
         _ => Json(json!(vector))
     }
 }

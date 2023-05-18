@@ -8,7 +8,7 @@ use serde_json::{Value, json};
 use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CreateCuttingInventoryRequest {
+pub struct CreateCuttingMaterialRequest {
     pub cutting_date: String,
     pub drawing_no: String,
     pub available_qty: i64,
@@ -23,16 +23,16 @@ pub struct CreateCuttingInventoryRequest {
     pub remarks: Option<String>
 }
 
-impl CreateCuttingInventoryRequest {
-    pub async fn create_cutting_inventory_table(
+impl CreateCuttingMaterialRequest {
+    pub async fn create_cutting_material_table(
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
 
         let service_response = service.client
         .execute(
-            "CREATE TABLE IF NOT EXISTS mwspl_cutting_inventory_table (
+            "CREATE TABLE IF NOT EXISTS mwspl_cutting_material_table (
                 id SERIAL NOT NULL,
-                cutting_store_pk TEXT NOT NULL PRIMARY KEY,
+                cutting_material_pk TEXT NOT NULL PRIMARY KEY,
                 cutting_date DATE NOT NULL,
                 drawing_no TEXT NOT NULL,
                 available_qty BIGINT NOT NULL,
@@ -51,7 +51,7 @@ impl CreateCuttingInventoryRequest {
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
                 remarks TEXT,
-                UNIQUE (cutting_store_pk)
+                UNIQUE (cutting_material_pk)
             )",
             &[]
         )
@@ -65,13 +65,13 @@ impl CreateCuttingInventoryRequest {
         }
     }
 
-    pub async fn drop_cutting_inventory_table(
+    pub async fn drop_cutting_material_table(
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
 
         let service_response = service.client
         .execute(
-            "DROP TABLE IF EXISTS mwspl_cutting_inventory_table;",
+            "DROP TABLE IF EXISTS mwspl_cutting_material_table;",
             &[]
         )
         .await
@@ -84,7 +84,7 @@ impl CreateCuttingInventoryRequest {
         }
     }
 
-    pub async fn truncate_cutting_inventory_table(
+    pub async fn truncate_cutting_material_table(
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
@@ -106,7 +106,7 @@ impl CreateCuttingInventoryRequest {
 
         let service_response = service.client
         .execute(
-            "TRUNCATE TABLE mwspl_cutting_inventory_table;",
+            "TRUNCATE TABLE mwspl_cutting_material_table;",
             &[]
         )
         .await
@@ -119,7 +119,7 @@ impl CreateCuttingInventoryRequest {
         }
     }
 
-    pub async fn create_new_cutting_inventory(
+    pub async fn create_new_cutting_material(
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<Self>
@@ -144,8 +144,8 @@ impl CreateCuttingInventoryRequest {
 
         let service_response = service.client
         .execute(
-            "INSERT INTO mwspl_cutting_inventory_table (
-                cutting_store_pk,
+            "INSERT INTO mwspl_cutting_material_table (
+                cutting_material_pk,
                 cutting_date,
                 drawing_no,
                 available_qty,

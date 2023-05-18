@@ -3,17 +3,16 @@ use chrono::{ naive::NaiveDate, DateTime, Local };
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CuttingMaterial {
-    pub cutting_store_pk: Uuid,
-    pub cutting_date: NaiveDate,
+pub struct HTMaterial {
+    pub ht_material_pk: Uuid,
+    pub ht_date: NaiveDate,
     pub drawing_no: String,
     pub available_qty: i64,
     pub heat_no: String,
     pub grade: String,
     pub section: i64,
     pub section_type: String,
-    pub gross_weight: f64,
-    pub cut_weight: f64,
+    pub forging_weight: f64,
     pub quality_status: String,
     pub batch_status: String,
     pub created_by: Option<String>,
