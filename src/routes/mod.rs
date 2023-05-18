@@ -24,7 +24,6 @@ use crate::routes::{
     cutting_store::create_cutting_inventory_routes,
 };
 
-
 pub async fn create_routes() -> Router {
     let client = Arc::new(DbService::new()
     .await
@@ -40,6 +39,7 @@ pub async fn create_routes() -> Router {
     .nest("/requisition/", create_requisition_routes().await)
     .nest("/material_issue/", create_material_issue_routes().await)
     .nest("/cutting_store", create_cutting_inventory_routes().await)
+
     .layer(Extension(client));
 
     routes
