@@ -1,10 +1,13 @@
-use serde::{ Serialize, Deserialize };
+use serde::{Serialize, Deserialize };
 use uuid::Uuid;
-use chrono::{ DateTime, NaiveDate, Local, Month };
+use std::sync::Arc;
+use chrono::{ DateTime, Local, NaiveDate, Month };
+use axum::{Extension, Json, extract::{Path}};
+use serde_json::{Value, json};
 
 use crate::service::DbService;
 
-#[derive(Debug, Clone Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateScheduleRequest {
     pub schedule_month: Month,
     pub schedule_year: i64,
@@ -25,7 +28,7 @@ pub struct CreateScheduleRequest {
 
 impl CreateScheduleRequest {
     pub async fn create_schedule_table(
-        Extension(service): Extension<DbService>
+        Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
         match service.client
         .execute(
@@ -67,7 +70,7 @@ impl CreateScheduleRequest {
     }
 
     pub async fn drop_schedule_table(
-        Extension(service): Extension<DbService>
+        Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
         match service.client
         .execute(
@@ -83,8 +86,24 @@ impl CreateScheduleRequest {
     }
 
     pub async fn truncate_schedule_table(
-        Extension(service): Extension<DbService>
+        Path((user, login_key)): Path<(String, String)>,
+        Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+        
         match service.client
         .execute(
             "TRUNCATE TABLE mwspl_schedule_table;",
@@ -103,6 +122,21 @@ impl CreateScheduleRequest {
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<Self>
     ) -> Json<Value> {
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+
         match service.client
         .execute(
             "INSERT INTO mwspl_schedule_table (
@@ -131,8 +165,8 @@ impl CreateScheduleRequest {
                 remarks
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)",
             &[
-                Uuid::new_v4().to_string(),
-                &payload.schedule_month,
+                &Uuid::new_v4().to_string(),
+                &payload.schedule_month.name(),
                 &payload.schedule_year,
                 &payload.drawing_no,
                 &payload.similar_part_no,

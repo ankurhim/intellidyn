@@ -10,6 +10,7 @@ pub mod cutting_material;
 pub mod forging_material;
 pub mod ht_material;
 pub mod fg_material;
+pub mod schedule;
 
 use axum::{Router, Extension};
 use std::sync::Arc;
@@ -28,6 +29,7 @@ use crate::routes::{
     forging_material::create_forging_material_routes,
     ht_material::create_ht_material_routes,
     fg_material::create_fg_material_routes,
+    schedule::create_schedule_routes,
 };
 
 pub async fn create_routes() -> Router {
@@ -48,6 +50,7 @@ pub async fn create_routes() -> Router {
     .nest("/forging_material/", create_forging_material_routes().await)
     .nest("/ht_material/", create_ht_material_routes().await)
     .nest("/fg_material/",create_fg_material_routes().await)
+    .nest("/schedule/", create_schedule_routes().await)
     .layer(Extension(client));
 
     routes

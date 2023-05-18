@@ -1,8 +1,8 @@
 use serde::{ Serialize, Deserialize };
 use uuid::Uuid;
-use chrono::{ DateTime, Local, Month };
+use chrono::{ DateTime, Local, Month, NaiveDate };
 
-#[derive(Debug, Clone Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Schedule {
     pub schedule_pk: Uuid,
     pub schedule_month: Month,

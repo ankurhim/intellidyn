@@ -11,6 +11,7 @@ bcrypt = "0.14.0"
 chrono = { version = "0.4.24", features = ["serde"] }
 dotenv = "0.15.0"
 native-tls = { version = "0.2.11", features = ["vendored"] }
+num-traits = "0.2.15"
 postgres-native-tls = "0.5.0"
 postgres-types = { version = "0.2.5", features = ["serde-1", "derive"] }
 serde = { version = "1.0.160", features = ["derive"] }
