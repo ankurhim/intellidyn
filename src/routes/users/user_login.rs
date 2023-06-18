@@ -30,10 +30,9 @@ impl UserLoginRequest {
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<UserLoginRequest>,
     ) -> Json<Value> {
-
         let query_result = service.client
         .query(
-            "SELECT * FROM mwspl_user_table WHERE username = $1", &[
+            "SELECT * FROM mwspl_user_table WHERE username = $1 ORDER BY created_on DESC LIMIT 1", &[
                 &payload.username
                 ]
         )

@@ -126,9 +126,6 @@ impl FindUserRequest {
             })
         }
 
-        Json(json!(FindUserResponse {
-            data: user_vector,
-            error: None,
-        }))
+        Json(json!(user_vector))
     }
 }

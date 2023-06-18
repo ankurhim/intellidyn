@@ -31,7 +31,7 @@ pub async fn create_user_routes() -> Router {
     .route("/login", post(UserLoginRequest::user_login))
     .route("/:username/:login_key/logout", get(UserLogoutRequest::user_logout))
     .route("/:username/:login_key/change_password", put(UpdateUserRequest::change_password))
-    // .route("/find_user_by_username", get(FindUserRequest::find_user_by_username))
+    .route("/:username/:login_key/find_user_by_username", get(FindUserRequest::find_user_by_username))
     // .route("/delete_user_by_username", delete(DeleteUserRequest::delete_user_by_username))
     // .route("/update_user_by_username", put(UpdateUserRequest::update_user_by_username))
 }
