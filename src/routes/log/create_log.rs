@@ -34,7 +34,7 @@ impl CreateLogRequest {
             );", &[]
         )
         .await
-        .map(|val| Json(json!(val)))
+        .map(|val| Json(json!(val))) 
         .map_err(|e| Json(json!(e.to_string())));
 
         match create_log_table {

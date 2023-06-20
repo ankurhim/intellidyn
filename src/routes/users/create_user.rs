@@ -21,12 +21,6 @@ pub struct CreateUserRequest {
     pub password: String,
     pub phone_no: Option<String>
 }
-/// Definition of response for creating a new user
-#[derive(Debug, Serialize)]
-pub struct CreateUserResponse {
-    pub data: Option<String>,
-    pub error: Option<String>
-}
 
 impl CreateUserRequest {
 
@@ -68,14 +62,8 @@ impl CreateUserRequest {
             "DROP TABLE IF EXISTS mwspl_user_table;", &[]
         )
         .await
-        .map(|val| Json(json!(CreateUserResponse {
-            data: Some(format!("{:?}", val)),
-            error: None,
-        })))
-        .map_err(|e| Json(json!(CreateUserResponse {
-            data: None,
-            error: Some(e.to_string())
-        })));
+        .map(|val| Json(json!(val)))
+        .map_err(|e| Json(json!(e.to_string())));
 
         drop_user_table.unwrap()
     }
@@ -103,7 +91,7 @@ impl CreateUserRequest {
 
         let hash = hash(&payload.password, DEFAULT_COST).expect("Hashing failed");
 
-        let result = service.client
+        match service.client
         .execute(
             "INSERT INTO mwspl_user_table(
                 user_pk,
@@ -133,17 +121,8 @@ impl CreateUserRequest {
             ]
         )
         .await
-        .map(|val| Json(json!(CreateUserResponse {
-            data: Some(format!("{:?}", val)),
-            error: None,
-        })))
-        .map_err(|e| {
-            Json(json!(CreateUserResponse {
-            data: None,
-            error: Some(e.as_db_error().unwrap().message().to_string())
-        }))});
-
-        match result {
+        .map(|val| Json(json!(val)))
+        .map_err(|e| Json(json!(e.to_string()))) {
             Ok(v) => v,
             Err(e) => e
         }

@@ -60,7 +60,7 @@ impl UserLoginRequest {
             };
     
             match verify(payload.password.unwrap(), &user.password.unwrap()).unwrap() {
-                false => Json(json!(Some("Invalid Credentials"))),
+                false => Json(json!(None::<bool>)),
                 true => CreateLogRequest::create_new_log(Extension(service.clone()), Json(CreateLogRequest { username: user.username, login_key: Uuid::new_v4().to_string() })).await
             }
         } else {
