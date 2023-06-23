@@ -11,6 +11,7 @@ pub mod forging_material;
 pub mod ht_material;
 pub mod fg_material;
 pub mod schedule;
+pub mod steels;
 
 use axum::{Router, Extension};
 use std::sync::Arc;
@@ -18,6 +19,7 @@ use std::sync::Arc;
 use crate::service::DbService;
 use crate::routes::{
     users::create_user_routes,
+    steels::create_steel_routes,
     log::create_log_routes,
     party::create_party_routes,
     bill_of_material::create_bill_of_material_routes,
@@ -39,6 +41,7 @@ pub async fn create_routes() -> Router {
 
     let routes = Router::new()
     .nest("/users/", create_user_routes().await)
+    .nest("/steels/",create_steel_routes().await)
     .nest("/log/", create_log_routes().await)
     .nest("/party/", create_party_routes().await)
     .nest("/bill_of_material/", create_bill_of_material_routes().await)
