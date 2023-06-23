@@ -11,7 +11,8 @@ use crate::routes::log::find_logs::FindLogRequest;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateLogRequest {
     pub username: String,
-    pub login_key: String
+    pub login_key: String,
+    pub role: String
 }
 
 impl CreateLogRequest {
@@ -27,6 +28,7 @@ impl CreateLogRequest {
                 log_pk TEXT NOT NULL,
                 username TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 login_key TEXT NOT NULL PRIMARY KEY,
+                role TEXT NOT NULL,
                 login_time TIMESTAMPTZ NOT NULL,
                 logout_time TIMESTAMPTZ,
                 remarks TEXT,
@@ -67,14 +69,16 @@ impl CreateLogRequest {
                 log_pk,
                 username,
                 login_key,
+                role,
                 login_time,
                 logout_time,
                 remarks
-            ) VALUES ($1, $2, $3, $4, $5, $6)",
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7)",
             &[
                 &Uuid::new_v4().to_string(),
                 &payload.username,
                 &payload.login_key,
+                &payload.role,
                 &Local::now(),
                 &None::<DateTime<Local>>,
                 &None::<String>

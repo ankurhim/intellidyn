@@ -19,7 +19,8 @@ pub struct CreateUserRequest {
     pub employee_id: String,
     pub username: String,
     pub password: String,
-    pub phone_no: Option<String>
+    pub email_id: Option<String>,
+    pub role: String,
 }
 
 impl CreateUserRequest {
@@ -37,7 +38,8 @@ impl CreateUserRequest {
                 employee_id TEXT NOT NULL,
                 username TEXT NOT NULL PRIMARY KEY,
                 password TEXT NOT NULL,
-                phone_no TEXT,
+                email_id TEXT,
+                role TEXT,
                 created_by TEXT NOT NULL,
                 created_on TIMESTAMPTZ NOT NULL,
                 modified_by TEXT,
@@ -99,20 +101,22 @@ impl CreateUserRequest {
                 employee_id,
                 username,
                 password,
-                phone_no,
+                email_id,
+                role,
                 created_by,
                 created_on,
                 modified_by,
                 modified_on,
                 remarks
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
             &[
                 &Uuid::new_v4().to_string(),
                 &payload.full_name,
                 &payload.employee_id,
                 &payload.username,
                 &hash,
-                &Some(payload.phone_no),
+                &Some(payload.email_id),
+                &payload.role,
                 &user,
                 &Local::now(),
                 &None::<String>,

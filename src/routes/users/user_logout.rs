@@ -25,15 +25,15 @@ impl UserLogoutRequest {
 
         match service.client
         .execute(
-            "UPDATE mwspl_log_table SET logout_time = $3 WHERE username = $1 AND login_key = $2", &[
+            "UPDATE mwspl_log_table SET logout_time = $3 WHERE username = $1 AND login_key = $2 AND logout_time IS NULL", &[
                 &user,
                 &login_key,
                 &Some(Local::now())
                 ]
         )
         .await
-        .map(|val| Json(json!(val)))
-        .map_err(|e| Json(json!(e.to_string()))) {
+        .map(|val| { println!("{}", &val); Json(json!(val))})
+        .map_err(|e| { println!("{}", &e.to_string()); Json(json!(e.to_string()))}) {
             Ok(v) => v,
             Err(e) => e
         }

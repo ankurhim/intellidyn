@@ -199,8 +199,8 @@ impl CreateBillOfMaterialRequest {
             ]
         )
         .await
-        .map(|val| Json(json!(val)))
-        .map_err(|e| Json(json!(e.to_string()))) {
+        .map(|val| {println!("{}", &val); Json(json!(val))})
+        .map_err(|e| {println!("{}", &e.to_string()); Json(json!(e.to_string()))}) {
             Ok(v) => v,
             Err(e) => e
         }

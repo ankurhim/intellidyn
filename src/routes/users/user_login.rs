@@ -51,17 +51,18 @@ impl UserLoginRequest {
                 employee_id: result.get(3),
                 username: result.get(4),
                 password: result.get(5),
-                phone_no: result.get(6),
-                created_by: result.get(7),
-                created_on: result.get(8),
-                modified_by: result.get(9),
-                modified_on: result.get(10),
-                remarks: result.get(11)
+                email_id: result.get(6),
+                role: result.get(7),
+                created_by: result.get(8),
+                created_on: result.get(9),
+                modified_by: result.get(10),
+                modified_on: result.get(11),
+                remarks: result.get(12)
             };
     
             match verify(payload.password.unwrap(), &user.password.unwrap()).unwrap() {
                 false => Json(json!(None::<bool>)),
-                true => CreateLogRequest::create_new_log(Extension(service.clone()), Json(CreateLogRequest { username: user.username, login_key: Uuid::new_v4().to_string() })).await
+                true => CreateLogRequest::create_new_log(Extension(service.clone()), Json(CreateLogRequest { username: user.username, login_key: Uuid::new_v4().to_string(), role: user.role })).await
             }
         } else {
             Json(json!(None::<bool>))

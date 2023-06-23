@@ -65,12 +65,13 @@ impl FindUserRequest {
                 employee_id: row.get(3),
                 username: row.get(4),
                 password: None::<String>,
-                phone_no: row.get(6),
-                created_by: row.get(7),
-                created_on: row.get(8),
-                modified_by: row.get(9),
-                modified_on: row.get(10),
-                remarks: row.get(11)
+                email_id: row.get(6),
+                role: row.get(7),
+                created_by: row.get(8),
+                created_on: row.get(9),
+                modified_by: row.get(10),
+                modified_on: row.get(11),
+                remarks: row.get(12)
             })
         }
 
@@ -116,13 +117,14 @@ impl FindUserRequest {
                 full_name: row.get(2),
                 employee_id: row.get(3),
                 username: row.get(4),
-                password: row.get(5),
-                phone_no: row.get(6),
-                created_by: row.get(7),
-                created_on: row.get(8),
-                modified_by: row.get(9),
-                modified_on: row.get(10),
-                remarks: row.get(11)
+                password: None::<String>,
+                email_id: row.get(6),
+                role: row.get(7),
+                created_by: row.get(8),
+                created_on: row.get(9),
+                modified_by: row.get(10),
+                modified_on: row.get(11),
+                remarks: row.get(12)
             })
         }
 
