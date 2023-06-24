@@ -1,17 +1,20 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
+use crate::steels::steel_model::Steel;
 
 use chrono::{DateTime, Local, NaiveDate};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Steel{
-    pub steel_pk: Uuid,
-    pub steel_code: String,
-    pub steel_grade: String,
-    pub section: i64,
-    pub section_type: String,
-    pub jominy_range: Option<String>,
-    pub steel_status: Option<String>,
+pub struct Part{
+    pub part_pk: Uuid,
+    pub part_code: String,
+    pub part_no: String,
+    pub part_name: String,
+    pub dwg_rev_no: String,
+    pub steel_grade: Steel,
+    pub gross_weight: f64,
+    pub cut_weight: f64,
+    pub cut_length: Option<f64>,
     pub created_by: Option<String>,
     pub created_on: DateTime<Local>,
     pub created_login_key: String,

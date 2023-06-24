@@ -56,7 +56,6 @@ impl CreateSteelRequest {
             section BIGINT NOT NULL,
             section_type TEXT NOT NULL,
             jominy_range TEXT,
-            steel_status TEXT,
             created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
             created_on TIMESTAMPTZ NOT NULL,
             created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -152,7 +151,6 @@ impl CreateSteelRequest {
             section,
             section_type,
             jominy_range,
-            steel_status,
             created_by,
             created_on,
             created_login_key,
@@ -160,14 +158,13 @@ impl CreateSteelRequest {
             modified_on,
             modified_login_key,
             remarks
-           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",&[
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",&[
             &Uuid::new_v4().to_string(),
                 &payload.steel_code,
                 &payload.steel_grade,
                 &payload.section,
                 &payload.section_type,
                 &payload.jominy_range,
-                &None::<String>,
                 &user,
                 &Local::now(),
                 &login_key,

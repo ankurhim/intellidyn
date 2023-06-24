@@ -55,7 +55,35 @@ impl FindSteelRequest {
         }
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_steel_table;", &[])
+        .query("SELECT * FROM mwspl_steel_table WHERE steel_status IS NULL;", &[])
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        get_list(resp.unwrap())
+    }
+
+    pub async fn find_all_steels_by_filter(
+        Path((user, login_key)): Path<(String, String)>,
+        Extension(service): Extension<Arc<DbService>>,
+        Query(value): Query<FindSteelRequest>
+    ) -> Json<Value> {
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+        
+        let resp = service.client
+        .query("SELECT * FROM mwspl_steel_table WHERE steel_code = $1 OR steel_grade = $1 AND steel_status IS NULL;", &[&value.filter])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
@@ -75,13 +103,14 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
             section: row.get(4),
             section_type: row.get(5),
             jominy_range: row.get(6),
-            created_by: row.get(7),
-            created_on: row.get(8),
-            created_login_key: row.get(9),
-            modified_by: row.get(10),
-            modified_on: row.get(11),
-            modified_login_key: row.get(12),
-            remarks: row.get(13)
+            steel_status: row.get(7),
+            created_by: row.get(8),
+            created_on: row.get(9),
+            created_login_key: row.get(10),
+            modified_by: row.get(11),
+            modified_on: row.get(12),
+            modified_login_key: row.get(13),
+            remarks: row.get(14)
         })
     };
     match &vector.len() {
