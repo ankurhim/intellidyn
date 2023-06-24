@@ -175,14 +175,14 @@ impl CreateSteelRequest {
             ]
         )
         .await
-        .map(|val| {println!("{}",&val); Json(json!(CreateSteelResponse {
+        .map(|val| Json(json!(CreateSteelResponse {
             data: Some(val.to_string()),
             error: None
-        }))})
-        .map_err(|err| {println!("{}",err.to_string()); Json(json!(CreateSteelResponse {
+        })))
+        .map_err(|err| Json(json!(CreateSteelResponse {
             data: None,
             error: Some(err.to_string())
-        }))})  {
+        })))  {
             Ok(v) => v,
             Err(e) => e
         }

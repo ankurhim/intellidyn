@@ -39,7 +39,6 @@ impl FindSteelRequest {
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
-
         let resp = service.client
         .query(
             "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
@@ -56,7 +55,7 @@ impl FindSteelRequest {
         }
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_steels_table;", &[])
+        .query("SELECT * FROM mwspl_steel_table;", &[])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
