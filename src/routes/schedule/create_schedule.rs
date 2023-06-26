@@ -22,8 +22,7 @@ pub struct CreateScheduleRequest {
     pub normal_commitment_date: Option<NaiveDate>,
     pub total_forging_qty: i64,
     pub recv_till: Option<i64>,
-    pub balance_qty: i64,
-    pub remarks: Option<String>
+    pub balance_qty: i64
 }
 
 impl CreateScheduleRequest {
@@ -37,7 +36,7 @@ impl CreateScheduleRequest {
                 schedule_pk TEXT NOT NULL,
                 schedule_month TEXT NOT NULL,
                 schedule_year TEXT NOT NULL,
-                drawing_no TEXT NOT NULL,
+                drawing_no TEXT NOT NULL REFERENCES mwspl_part_table(part_code) ON UPDATE CASCADE ON DELETE NO ACTION,
                 similar_part_no TEXT NOT NULL,
                 customer_plant TEXT NOT NULL,
                 supplier_plant TEXT NOT NULL,
@@ -55,8 +54,7 @@ impl CreateScheduleRequest {
                 created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE NO ACTION,
                 modified_on TIMESTAMPTZ,
-                modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
-                remarks TEXT,
+                modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION
                 UNIQUE (schedule_month, schedule_year, drawing_no)
             );",
             &[]
@@ -161,8 +159,7 @@ impl CreateScheduleRequest {
                 created_login_key,
                 modified_by,
                 modified_on,
-                modified_login_key,
-                remarks
+                modified_login_key
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)",
             &[
                 &Uuid::new_v4().to_string(),
@@ -185,8 +182,7 @@ impl CreateScheduleRequest {
                 &login_key,
                 &None::<String>,
                 &None::<DateTime<Local>>,
-                &None::<String>,
-                &payload.remarks
+                &None::<String>
             ]
         )
         .await

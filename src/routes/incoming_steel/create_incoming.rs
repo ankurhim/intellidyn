@@ -11,14 +11,17 @@ use crate::service::DbService;
 pub struct CreateIncomingSteelRequest {
     pub challan_no: String,
     pub challan_date: String,
-    pub grade: String,
-    pub section: i64,
-    pub section_type: String,
+    pub steel_code: String,
     pub heat_no: String,
     pub heat_code: Option<String>,
     pub jominy_value: Option<String>,
-    pub received_qty: i64,
-    pub remarks: Option<String>
+    pub received_qty: i64
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateIncomingSteelResponse {
+    pub data: Option<String>,
+    pub error: Option<String>
 }
 
 impl CreateIncomingSteelRequest {
@@ -33,9 +36,7 @@ impl CreateIncomingSteelRequest {
                 incoming_steel_pk TEXT NOT NULL,
                 challan_no TEXT NOT NULL,
                 challan_date DATE NOT NULL,
-                grade TEXT NOT NULL,
-                section BIGINT NOT NULL,
-                section_type TEXT NOT NULL,
+                steel_code TEXT NOT NULL REFERENCES mwspl_steel_table(steel_code) ON UPDATE CASCADE ON DELETE NO ACTION,
                 heat_no TEXT NOT NULL,
                 heat_code TEXT,
                 jominy_value TEXT,
@@ -55,8 +56,14 @@ impl CreateIncomingSteelRequest {
             &[]
         )
         .await
-        .map(|val| Json(json!(val)))
-        .map_err(|e| Json(json!(e.to_string()))) {
+        .map(|val| Json(json!(CreateIncomingSteelResponse {
+            data: Some(val.to_string()),
+            error: None
+        })))
+        .map_err(|err| Json(json!(CreateIncomingSteelResponse {
+            data: None,
+            error: Some(err.to_string())
+        })))  {
             Ok(v) => v,
             Err(e) => e
         }
@@ -66,16 +73,20 @@ impl CreateIncomingSteelRequest {
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
 
-        let drop_incoming_steel_table = service.client
+        match service.client
         .execute(
             "DROP TABLE IF EXISTS mwspl_incoming_steel_table;",
             &[]
         )
         .await
-        .map(|val| Json(json!(val)))
-        .map_err(|e| Json(json!(e.to_string())));
-
-        match drop_incoming_steel_table {
+        .map(|val| Json(json!(CreateIncomingSteelResponse {
+            data: Some(val.to_string()),
+            error: None
+        })))
+        .map_err(|err| Json(json!(CreateIncomingSteelResponse {
+            data: None,
+            error: Some(err.to_string())
+        })))  {
             Ok(v) => v,
             Err(e) => e
         }
@@ -110,9 +121,7 @@ impl CreateIncomingSteelRequest {
                 incoming_steel_pk,
                 challan_no,
                 challan_date,
-                grade,
-                section,
-                section_type,
+                steel_code,
                 heat_no,
                 heat_code,
                 jominy_value,
@@ -125,16 +134,13 @@ impl CreateIncomingSteelRequest {
                 created_login_key,
                 modified_by,
                 modified_on,
-                modified_login_key,
-                remarks
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16,$17, $18, $19, $20)",
+                modified_login_key
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
             &[
                 &Uuid::new_v4().to_string(),
                 &payload.challan_no,
                 &challan_date,
-                &payload.grade,
-                &payload.section,
-                &payload.section_type,
+                &payload.steel_code,
                 &payload.heat_no,
                 &payload.heat_code,
                 &payload.jominy_value,
@@ -147,13 +153,18 @@ impl CreateIncomingSteelRequest {
                 &login_key,
                 &None::<String>,
                 &None::<DateTime<Local>>,
-                &None::<String>,
-                &payload.remarks
+                &None::<String>
             ]
         )
         .await
-        .map(|val| Json(json!(val)))
-        .map_err(|e| Json(json!(e.to_string()))) {
+        .map(|val| Json(json!(CreateIncomingSteelResponse {
+            data: Some(val.to_string()),
+            error: None
+        })))
+        .map_err(|err| Json(json!(CreateIncomingSteelResponse {
+            data: None,
+            error: Some(err.to_string())
+        })))  {
             Ok(v) => v,
             Err(e) => e
         }

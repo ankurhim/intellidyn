@@ -8,9 +8,7 @@ pub struct IncomingSteel {
     pub incoming_steel_pk: Uuid,
     pub challan_no: String,
     pub challan_date: NaiveDate,
-    pub grade: String,
-    pub section: i64,
-    pub section_type: String,
+    pub steel_code: String,
     pub heat_no: String,
     pub heat_code: Option<String>,
     pub jominy_value: Option<String>,
@@ -23,6 +21,5 @@ pub struct IncomingSteel {
     pub created_login_key: String,
     pub modified_by: Option<String>,
     pub modified_on: Option<DateTime<Local>>,
-    pub modified_login_key: Option<String>,
-    pub remarks: Option<String>
+    pub modified_login_key: Option<String>
 }

@@ -63,34 +63,34 @@ impl FindBillOfMaterialRequest {
         get_list(resp.unwrap())
     }
 
-    pub async fn find_all_boms_by_dwg_no(
-        Path((user, login_key)): Path<(String, String)>,
-        Extension(service): Extension<Arc<DbService>>,
-        Query(payload): Query<FindBillOfMaterialRequest>
-    ) -> Json<Value> {
+    // pub async fn find_all_boms_by_dwg_no(
+    //     Path((user, login_key)): Path<(String, String)>,
+    //     Extension(service): Extension<Arc<DbService>>,
+    //     Query(payload): Query<FindBillOfMaterialRequest>
+    // ) -> Json<Value> {
 
-        let resp = service.client
-        .query(
-            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
-        )
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
+    //     let resp = service.client
+    //     .query(
+    //         "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+    //     )
+    //     .await
+    //     .map_err(|e| Json(json!(e.to_string())));
 
-        for row in resp.unwrap() {
-            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
-                break;
-            } else {
-                return Json(json!("You are logged out"));
-            }
-        }
+    //     for row in resp.unwrap() {
+    //         if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+    //             break;
+    //         } else {
+    //             return Json(json!("You are logged out"));
+    //         }
+    //     }
         
-        let resp = service.client
-        .query("SELECT * FROM mwspl_bom_table WHERE drawing_no = $1;", &[&payload.filter])
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
+    //     let resp = service.client
+    //     .query("SELECT * FROM mwspl_bom_table WHERE drawing_no = $1;", &[&payload.filter])
+    //     .await
+    //     .map_err(|e| Json(json!(e.to_string())));
 
-        get_list(resp.unwrap())
-    }
+    //     get_list(resp.unwrap())
+    // }
 
     pub async fn find_active_boms(
         Path((user, login_key)): Path<(String, String)>,
@@ -120,68 +120,68 @@ impl FindBillOfMaterialRequest {
         get_list(resp.unwrap())
     }
 
-    pub async fn find_active_boms_by_dwg_no(
-        Path((user, login_key)): Path<(String, String)>,
-        Extension(service): Extension<Arc<DbService>>,
-        Query(payload): Query<FindBillOfMaterialRequest>
-    ) -> Json<Value> {
+    // pub async fn find_active_boms_by_dwg_no(
+    //     Path((user, login_key)): Path<(String, String)>,
+    //     Extension(service): Extension<Arc<DbService>>,
+    //     Query(payload): Query<FindBillOfMaterialRequest>
+    // ) -> Json<Value> {
 
-        let resp = service.client
-        .query(
-            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
-        )
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
+    //     let resp = service.client
+    //     .query(
+    //         "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+    //     )
+    //     .await
+    //     .map_err(|e| Json(json!(e.to_string())));
 
-        for row in resp.unwrap() {
-            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
-                break;
-            } else {
-                return Json(json!("You are logged out"));
-            }
-        }
+    //     for row in resp.unwrap() {
+    //         if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+    //             break;
+    //         } else {
+    //             return Json(json!("You are logged out"));
+    //         }
+    //     }
         
-        let resp = service.client
-        .query("SELECT * FROM mwspl_bom_table WHERE drawing_no = $1 AND po_status = 'ACTIVE';", &[&payload.filter])
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
+    //     let resp = service.client
+    //     .query("SELECT * FROM mwspl_bom_table WHERE drawing_no = $1 AND po_status = 'ACTIVE';", &[&payload.filter])
+    //     .await
+    //     .map_err(|e| Json(json!(e.to_string())));
 
-        get_list(resp.unwrap())
-    }
+    //     get_list(resp.unwrap())
+    // }
 
-    pub async fn find_all_dwg_no(
-        Path((user, login_key)): Path<(String, String)>,
-        Extension(service): Extension<Arc<DbService>>
-    ) -> Json<Value> {
+    // pub async fn find_all_dwg_no(
+    //     Path((user, login_key)): Path<(String, String)>,
+    //     Extension(service): Extension<Arc<DbService>>
+    // ) -> Json<Value> {
 
-        let resp = service.client
-        .query(
-            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
-        )
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
+    //     let resp = service.client
+    //     .query(
+    //         "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+    //     )
+    //     .await
+    //     .map_err(|e| Json(json!(e.to_string())));
 
-        for row in resp.unwrap() {
-            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
-                break;
-            } else {
-                return Json(json!("You are logged out"));
-            }
-        }
+    //     for row in resp.unwrap() {
+    //         if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+    //             break;
+    //         } else {
+    //             return Json(json!("You are logged out"));
+    //         }
+    //     }
         
-        let resp = service.client
-        .query("SELECT DISTINCT drawing_no, gross_weight, cut_weight FROM mwspl_bom_table WHERE po_status = 'ACTIVE';", &[])
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
+    //     let resp = service.client
+    //     .query("SELECT DISTINCT drawing_no, gross_weight, cut_weight FROM mwspl_bom_table WHERE po_status = 'ACTIVE';", &[])
+    //     .await
+    //     .map_err(|e| Json(json!(e.to_string())));
 
-        let mut part_list: Vec<(String, f64, f64)> = Vec::new();
+    //     let mut part_list: Vec<(String, f64, f64)> = Vec::new();
 
-        for row in resp.unwrap() {
-            part_list.push((row.get(0), row.get(1), row.get(2)))
-        }
+    //     for row in resp.unwrap() {
+    //         part_list.push((row.get(0), row.get(1), row.get(2)))
+    //     }
 
-        Json(json!(part_list))
-    }
+    //     Json(json!(part_list))
+    // }
 
     pub async fn find_by_dwg_no(
         Path((user, login_key)): Path<(String, String)>,
@@ -235,24 +235,14 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
             po_status: row.get(8),
             po_deactive_date: row.get(9),
             rate: row.get(10),
-            item_type: row.get(11),
-            drawing_no: row.get(12),
-            part_name: row.get(13),
-            part_no: row.get(14),
-            grade: row.get(15),
-            section: row.get(16),
-            section_type: row.get(17),
-            jominy_range: row.get(18),
-            gross_weight: row.get(19),
-            cut_weight: row.get(20),
-            manufacturing_stage: row.get(21),
-            created_by: row.get(22),
-            created_on: row.get(23),
-            created_login_key: row.get(24),
-            modified_by: row.get(25),
-            modified_on: row.get(26),
-            modified_login_key: row.get(27),
-            remarks: row.get(28)
+            part_code: row.get(11),
+            steel_code: row.get(12),
+            created_by: row.get(13),
+            created_on: row.get(14),
+            created_login_key: row.get(15),
+            modified_by: row.get(16),
+            modified_on: row.get(17),
+            modified_login_key: row.get(18)
         })
     };
     match &vector.len() {

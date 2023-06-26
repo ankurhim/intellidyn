@@ -25,6 +25,5 @@ pub struct Schedule {
     pub created_login_key: String,
     pub modified_by: Option<String>,
     pub modified_on: Option<DateTime<Local>>,
-    pub modified_login_key: Option<String>,
-    pub remarks: Option<String>
+    pub modified_login_key: Option<String>
 }

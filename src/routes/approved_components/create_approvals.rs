@@ -18,9 +18,6 @@ use crate::error::AppError;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateApprovedComponentRequest {
     pub heat_no: String,
-    pub grade: String,
-    pub section: i64,
-    pub section_type: String,
     pub part_list: Vec<String>,
     pub remarks: Option<String>
 }
@@ -43,17 +40,13 @@ impl CreateApprovedComponentRequest {
                 id SERIAL NOT NULL,
                 approval_pk TEXT NOT NULL,
                 heat_no TEXT NOT NULL,
-                grade TEXT NOT NULL,
-                section INT NOT NULL,
-                section_type TEXT NOT NULL,
-                approved_part TEXT,
+                approved_part TEXT NOT NULL REFERENCES mwspl_part_table(part_code) ON UPDATE CASCADE ON DELETE NO ACTION,
                 created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 created_on TIMESTAMPTZ NOT NULL,
                 created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE NO ACTION,
                 modified_on TIMESTAMPTZ,
-                modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
-                remarks TEXT,
+                modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION
                 UNIQUE (heat_no, grade, section, section_type, approved_part),
                 CONSTRAINT pk_approval PRIMARY KEY (heat_no, grade, section, section_type, approved_part)
             );",
@@ -116,32 +109,24 @@ impl CreateApprovedComponentRequest {
                     "INSERT INTO mwspl_approved_component_table (
                         approval_pk,
                         heat_no,
-                        grade,
-                        section,
-                        section_type,
                         approved_part,
                         created_by,
                         created_on,
                         created_login_key,
                         modified_by,
                         modified_on,
-                        modified_login_key,
-                        remarks
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+                        modified_login_key
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
                     &[
                         &Uuid::new_v4().to_string(),
                         &payload.heat_no.clone(),
-                        &payload.grade.clone(),
-                        &payload.section.clone(),
-                        &payload.section_type.clone(),
                         &part.to_string(),
                         &user,
                         &Local::now(),
                         &login_key,
                         &None::<String>,
                         &None::<DateTime<Local>>,
-                        &None::<String>,
-                        &payload.remarks
+                        &None::<String>
                     ]
                 )
                 .await

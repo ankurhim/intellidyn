@@ -13,11 +13,13 @@ pub struct CreatePartyRequest {
     pub party_type: String,
     pub party_name: String,
     pub party_address: String,
-    pub gstn: String,
-    pub contact_person: Option<String>,
-    pub email_id: Option<String>,
-    pub contact_no: Option<String>,
-    pub remarks: Option<String>
+    pub gstn: String
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreatePartyResponse {
+    pub data: Option<String>,
+    pub error: Option<String>
 }
 
 impl CreatePartyRequest {
@@ -35,23 +37,25 @@ impl CreatePartyRequest {
                 party_name TEXT NOT NULL,
                 party_address TEXT NOT NULL,
                 gstn TEXT NOT NULL,
-                contact_person TEXT,
-                email_id TEXT,
-                contact_no TEXT,
                 created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 created_on TIMESTAMPTZ NOT NULL,
                 created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE NO ACTION,
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
-                remarks TEXT,
                 UNIQUE (party_id, gstn)
             );",
             &[]
         )
         .await
-        .map(|val| Json(json!(val)))
-        .map_err(|e| Json(json!(e.to_string()))) {
+        .map(|val| Json(json!(CreatePartyResponse {
+            data: Some(val.to_string()),
+            error: None
+        })))
+        .map_err(|err| Json(json!(CreatePartyResponse {
+            data: None,
+            error: Some(err.to_string())
+        }))) {
             Ok(v) => v,
             Err(e) => e
         }
@@ -61,16 +65,20 @@ impl CreatePartyRequest {
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
 
-        let drop_party_table = service.client
+        match service.client
         .execute(
             "DROP TABLE IF EXISTS mwspl_party_table;",
             &[]
         )
         .await
-        .map(|val| Json(json!(val)))
-        .map_err(|e| Json(json!(e.to_string())));
-
-        match drop_party_table {
+        .map(|val| Json(json!(CreatePartyResponse {
+            data: Some(val.to_string()),
+            error: None
+        })))
+        .map_err(|err| Json(json!(CreatePartyResponse {
+            data: None,
+            error: Some(err.to_string())
+        })))  {
             Ok(v) => v,
             Err(e) => e
         }
@@ -106,17 +114,13 @@ impl CreatePartyRequest {
                 party_name,
                 party_address,
                 gstn,
-                contact_person,
-                email_id,
-                contact_no,
                 created_by,
                 created_on,
                 created_login_key,
                 modified_by,
                 modified_on,
-                modified_login_key,
-                remarks
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
+                modified_login_key
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
             &[
                 &Uuid::new_v4().to_string(),
                 &payload.party_id,
@@ -124,21 +128,23 @@ impl CreatePartyRequest {
                 &payload.party_name,
                 &payload.party_address,
                 &payload.gstn,
-                &payload.contact_person,
-                &payload.email_id,
-                &payload.contact_no,
                 &user,
                 &Local::now(),
                 &login_key,
                 &None::<String>,
                 &None::<DateTime<Local>>,
-                &None::<String>,
-                &payload.remarks
+                &None::<String>
             ]
         )
         .await
-        .map(|val| Json(json!(val)))
-        .map_err(|e| Json(json!(e.to_string()))) {
+        .map(|val| Json(json!(CreatePartyResponse {
+            data: Some(val.to_string()),
+            error: None
+        })))
+        .map_err(|err| Json(json!(CreatePartyResponse {
+            data: None,
+            error: Some(err.to_string())
+        })))  {
             Ok(v) => v,
             Err(e) => e
         }
