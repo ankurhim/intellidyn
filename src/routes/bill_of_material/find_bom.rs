@@ -237,12 +237,13 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
             rate: row.get(10),
             part_code: row.get(11),
             steel_code: row.get(12),
-            created_by: row.get(13),
-            created_on: row.get(14),
-            created_login_key: row.get(15),
-            modified_by: row.get(16),
-            modified_on: row.get(17),
-            modified_login_key: row.get(18)
+            machine_id: row.get(13),
+            created_by: row.get(14),
+            created_on: row.get(15),
+            created_login_key: row.get(16),
+            modified_by: row.get(17),
+            modified_on: row.get(18),
+            modified_login_key: row.get(19)
         })
     };
     match &vector.len() {

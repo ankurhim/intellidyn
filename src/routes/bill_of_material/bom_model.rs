@@ -17,6 +17,7 @@ pub struct BillOfMaterial {
     pub rate: f64,
     pub steel_code: String,
     pub part_code: String,
+    pub machine_id: Vec<String>,
     pub created_by: Option<String>,
     pub created_on: DateTime<Local>,
     pub created_login_key: String,

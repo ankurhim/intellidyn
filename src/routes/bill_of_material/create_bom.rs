@@ -19,7 +19,8 @@ pub struct CreateBillOfMaterialRequest {
     pub po_deactive_date: Option<String>,
     pub rate: f64,
     pub part_code: String,
-    pub steel_code: String
+    pub steel_code: String,
+    pub machine_id: String
 }
 
 impl CreateBillOfMaterialRequest {
@@ -43,13 +44,14 @@ impl CreateBillOfMaterialRequest {
                 rate FLOAT8,
                 part_code TEXT NOT NULL REFERENCES mwspl_part_table(part_code) ON UPDATE CASCADE ON DELETE NO ACTION,
                 steel_code TEXT NOT NULL REFERENCES mwspl_steel_table(steel_code) ON UPDATE CASCADE ON DELETE NO ACTION,
+                machine_id TEXT ARRAY NOT NULL REFERENCES mwspl_machine_table(machine_id) ON UPDATE CASCADE ON DELETE NO ACTION,
                 created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 created_on TIMESTAMPTZ NOT NULL,
                 created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE NO ACTION,
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
-                UNIQUE (purchase_order_no, party_id, part_no, drawing_no, po_status)
+                UNIQUE (party_id, part_code, steel_code, machine_id)
             );",
             &[]
         )
@@ -130,13 +132,14 @@ impl CreateBillOfMaterialRequest {
                 rate,
                 part_code,
                 steel_code,
+                machine_id,
                 created_by,
                 created_on,
                 created_login_key,
                 modified_by,
                 modified_on,
                 modified_login_key
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
             &[
                 &Uuid::new_v4().to_string(),
                 &payload.purchase_order_no,
@@ -150,6 +153,7 @@ impl CreateBillOfMaterialRequest {
                 &payload.rate,
                 &payload.part_code,
                 &payload.steel_code,
+                &payload.machine_id,
                 &user,
                 &Local::now(),
                 &login_key,
