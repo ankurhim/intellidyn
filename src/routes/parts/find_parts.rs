@@ -55,7 +55,7 @@ impl FindPartRequest {
         }
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_part_table;", &[])
+        .query("SELECT * FROM mwspl_part_table WHERE part_status IS NULL;", &[])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
@@ -106,12 +106,13 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
             gross_weight: row.get(7),
             cut_weight: row.get(8),
             cut_length:row.get(9),
-            created_by: row.get(10),
-            created_on: row.get(11),
-            created_login_key: row.get(12),
-            modified_by: row.get(13),
-            modified_on: row.get(14),
-            modified_login_key: row.get(15)
+            part_status: row.get(10),
+            created_by: row.get(11),
+            created_on: row.get(12),
+            created_login_key: row.get(13),
+            modified_by: row.get(14),
+            modified_on: row.get(15),
+            modified_login_key: row.get(16)
         })
     };
     match &vector.len() {

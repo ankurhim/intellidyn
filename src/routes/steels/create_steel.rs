@@ -25,27 +25,8 @@ pub struct CreateSteelResponse {
 
 impl CreateSteelRequest {
     pub async fn create_steel_table(
-        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
-
-        let resp = service.client
-        .query(
-            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
-        )
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
-
-        for row in resp.unwrap() {
-            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
-                break;
-            } else {
-                return Json(json!(CreateSteelResponse {
-                    data: None,
-                    error: Some("The user is not authorized".to_string())
-                }));
-            }
-        }
         
         match service.client
         .execute("CREATE TABLE IF NOT EXISTS mwspl_steel_table(
@@ -80,31 +61,50 @@ impl CreateSteelRequest {
         }
     }
 
-    pub async fn drop_steel_table(
-        Path((user, login_key)): Path<(String, String)>,   
+    pub async fn drop_steel_table(  
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
-        let resp = service.client
-        .query(
-            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
-        )
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
-
-        for row in resp.unwrap() {
-            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
-                break;
-            } else {
-                return Json(json!(CreateSteelResponse {
-                    data: None,
-                    error: Some("The user is not authorized".to_string())
-                }));
-            }
-        }
 
         match service.client
         .execute(
             "DROP TABLE IF EXISTS mwspl_steel_table;", &[]
+        )
+        .await
+        .map(|val| Json(json!(CreateSteelResponse {
+            data: Some(val.to_string()),
+            error: None
+        })))
+        .map_err(|err| Json(json!(CreateSteelResponse {
+            data: None,
+            error: Some(err.to_string())
+        }))) {
+            Ok(v) => v,
+            Err(e) => e
+        }
+    }
+
+    pub async fn upload_steels(  
+        Extension(service): Extension<Arc<DbService>>,
+    ) -> Json<Value> {
+
+        match service.client
+        .execute(
+            "IMPORT INTO mwspl_steel_table (
+                steel_pk,
+                steel_code,
+                steel_grade,
+                section,
+                section_type,
+                jominy_range,
+                steel_status,
+                created_by,
+                created_on,
+                created_login_key,
+                modified_by,
+                modified_on,
+                modified_login_key,
+                remarks
+            ) CSV DATA ('s3://intellidynbucket/steel.csv?AWS_ACCESS_KEY_ID=AKIARRCN4LBXXWNQXZ4J&AWS_SECRET_ACCESS_KEY=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');", &[]
         )
         .await
         .map(|val| Json(json!(CreateSteelResponse {

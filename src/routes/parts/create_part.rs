@@ -28,27 +28,8 @@ pub struct CreatePartResponse {
 
 impl CreatePartRequest {
     pub async fn create_part_table(
-        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
-
-        let resp = service.client
-        .query(
-            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
-        )
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
-
-        for row in resp.unwrap() {
-            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
-                break;
-            } else {
-                return Json(json!(CreatePartResponse {
-                    data: None,
-                    error: Some("The user is not authorized".to_string())
-                }));
-            }
-        }
         
         match service.client
         .execute("CREATE TABLE IF NOT EXISTS mwspl_part_table(
@@ -62,6 +43,7 @@ impl CreatePartRequest {
             gross_weight FLOAT8 NOT NULL,
             cut_weight FLOAT8 NOT NULL,
             cut_length FLOAT8,
+            part_status TEXT,
             created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
             created_on TIMESTAMPTZ NOT NULL,
             created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -84,27 +66,9 @@ impl CreatePartRequest {
         }
     }
 
-    pub async fn drop_part_table(
-        Path((user, login_key)): Path<(String, String)>,   
+    pub async fn drop_part_table( 
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
-        let resp = service.client
-        .query(
-            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
-        )
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
-
-        for row in resp.unwrap() {
-            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
-                break;
-            } else {
-                return Json(json!(CreatePartResponse {
-                    data: None,
-                    error: Some("The user is not authorized".to_string())
-                }));
-            }
-        }
 
         match service.client
         .execute(
@@ -159,13 +123,14 @@ impl CreatePartRequest {
             gross_weight,
             cut_weight,
             cut_length,
+            part_status,
             created_by,
             created_on,
             created_login_key,
             modified_by,
             modified_on,
             modified_login_key
-           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
            &[
             &Uuid::new_v4().to_string(),
             &payload.part_code,
@@ -176,6 +141,7 @@ impl CreatePartRequest {
             &payload.gross_weight,
             &payload.cut_weight,
             &payload.cut_length,
+            &None::<String>,
             &user,
             &Local::now(),
             &login_key,

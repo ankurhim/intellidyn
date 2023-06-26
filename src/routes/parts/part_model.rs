@@ -15,6 +15,7 @@ pub struct Part{
     pub gross_weight: f64,
     pub cut_weight: f64,
     pub cut_length: Option<f64>,
+    pub part_status: Option<String>,
     pub created_by: Option<String>,
     pub created_on: DateTime<Local>,
     pub created_login_key: String,
