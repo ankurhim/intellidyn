@@ -72,15 +72,13 @@ impl FindIncomingSteelRequest {
                 heat_code:row.get(6),
                 jominy_value:row.get(7),
                 received_qty:row.get(8),
-                issued_qty:row.get(9),
-                available_qty:row.get(10),
-                heat_status:row.get(11),
-                created_by: row.get(12),
-                created_on: row.get(13),
-                created_login_key: row.get(14),
-                modified_by: row.get(15),
-                modified_on: row.get(16),
-                modified_login_key: row.get(17)
+                heat_status:row.get(9),
+                created_by: row.get(10),
+                created_on: row.get(11),
+                created_login_key: row.get(12),
+                modified_by: row.get(13),
+                modified_on: row.get(14),
+                modified_login_key: row.get(15)
             })
         };
         match &steel_vector.len() {
@@ -127,15 +125,13 @@ impl FindIncomingSteelRequest {
                 heat_code:row.get(6),
                 jominy_value:row.get(7),
                 received_qty:row.get(8),
-                issued_qty:row.get(9),
-                available_qty:row.get(10),
-                heat_status:row.get(11),
-                created_by: row.get(12),
-                created_on: row.get(13),
-                created_login_key: row.get(14),
-                modified_by: row.get(15),
-                modified_on: row.get(16),
-                modified_login_key: row.get(17)
+                heat_status:row.get(9),
+                created_by: row.get(10),
+                created_on: row.get(11),
+                created_login_key: row.get(12),
+                modified_by: row.get(13),
+                modified_on: row.get(14),
+                modified_login_key: row.get(15)
             })
         };
         match &steel_vector.len() {

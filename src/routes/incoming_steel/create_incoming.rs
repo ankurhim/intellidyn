@@ -41,8 +41,6 @@ impl CreateIncomingSteelRequest {
                 heat_code TEXT,
                 jominy_value TEXT,
                 received_qty BIGINT NOT NULL,
-                issued_qty BIGINT NOT NULL,
-                available_qty BIGINT NOT NULL,
                 heat_status TEXT,
                 created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 created_on TIMESTAMPTZ NOT NULL,
@@ -51,7 +49,7 @@ impl CreateIncomingSteelRequest {
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
                 remarks TEXT,
-                UNIQUE (challan_no, heat_no, grade, section, section_type)
+                UNIQUE (challan_no, heat_no)
             );",
             &[]
         )
@@ -113,7 +111,7 @@ impl CreateIncomingSteelRequest {
             }
         }
 
-        let challan_date = NaiveDate::parse_from_str(&payload.challan_date, "%d-%m-%Y").expect("Challan Date parsing error");
+        let challan_date = NaiveDate::parse_from_str(&payload.challan_date, "%Y-%m-%d").expect("Challan Date parsing error");
         
         match service.client
         .execute(
@@ -126,8 +124,6 @@ impl CreateIncomingSteelRequest {
                 heat_code,
                 jominy_value,
                 received_qty,
-                issued_qty,
-                available_qty,
                 heat_status,
                 created_by,
                 created_on,
@@ -135,7 +131,7 @@ impl CreateIncomingSteelRequest {
                 modified_by,
                 modified_on,
                 modified_login_key
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)",
             &[
                 &Uuid::new_v4().to_string(),
                 &payload.challan_no,
@@ -145,8 +141,6 @@ impl CreateIncomingSteelRequest {
                 &payload.heat_code,
                 &payload.jominy_value,
                 &payload.received_qty,
-                &0_i64,
-                &(payload.received_qty - 0_i64),
                 &None::<String>,
                 &user,
                 &Local::now(),
