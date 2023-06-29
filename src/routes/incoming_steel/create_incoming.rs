@@ -32,8 +32,8 @@ impl CreateIncomingSteelRequest {
         match service.client
         .execute(
             "CREATE TABLE IF NOT EXISTS mwspl_incoming_steel_table(
-                id SERIAL NOT NULL PRIMARY KEY,
-                incoming_steel_pk TEXT NOT NULL,
+                id SERIAL NOT NULL,
+                incoming_steel_pk TEXT NOT NULL PRIMARY KEY,
                 challan_no TEXT NOT NULL,
                 challan_date DATE NOT NULL,
                 steel_code TEXT NOT NULL REFERENCES mwspl_steel_table(steel_code) ON UPDATE CASCADE ON DELETE NO ACTION,
@@ -49,7 +49,7 @@ impl CreateIncomingSteelRequest {
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
                 remarks TEXT,
-                UNIQUE (challan_no, heat_no)
+                UNIQUE (challan_no, heat_no, incoming_steel_pk)
             );",
             &[]
         )

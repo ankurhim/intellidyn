@@ -36,19 +36,20 @@ impl CreateApprovedComponentRequest {
 
         match service.client
         .execute(
-            "CREATE TABLE IF NOT EXISTS mwspl_approved_component_table (
+            "CREATE TABLE IF NOT EXISTS mwspl_approved_component_table(
                 id SERIAL NOT NULL,
-                approval_pk TEXT NOT NULL,
+                approval_pk TEXT NOT NULL PRIMARY KEY,
+                rm_id TEXT NOT NULL REFERENCES mwspl_incoming_steel_table(incoming_steel_pk) ON UPDATE CASCADE ON DELETE NO ACTION,
                 heat_no TEXT NOT NULL,
+                avail_qty FLOAT8 NOT NULL,
                 approved_part TEXT NOT NULL REFERENCES mwspl_part_table(part_code) ON UPDATE CASCADE ON DELETE NO ACTION,
                 created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 created_on TIMESTAMPTZ NOT NULL,
                 created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE NO ACTION,
                 modified_on TIMESTAMPTZ,
-                modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION
-                UNIQUE (heat_no, grade, section, section_type, approved_part),
-                CONSTRAINT pk_approval PRIMARY KEY (heat_no, grade, section, section_type, approved_part)
+                modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
+                UNIQUE (heat_no, approved_part)
             );",
             &[]
         )
@@ -109,6 +110,7 @@ impl CreateApprovedComponentRequest {
                     "INSERT INTO mwspl_approved_component_table (
                         approval_pk,
                         heat_no,
+                        avail_qty,
                         approved_part,
                         created_by,
                         created_on,
@@ -116,7 +118,7 @@ impl CreateApprovedComponentRequest {
                         modified_by,
                         modified_on,
                         modified_login_key
-                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                    ) VALUES ($1, $2, $3, (SELECT received_qty FROM mwspl_incoming_steel_table), $5, $6, $7, $8, $9, $10)",
                     &[
                         &Uuid::new_v4().to_string(),
                         &payload.heat_no.clone(),

@@ -14,6 +14,9 @@ pub struct Cutting {
     pub part_no: String,
     pub heat_no: String,
     pub heat_code: Option<String>,
+    pub steel_grade: String,
+    pub section: i64,
+    pub section_type: String,
     pub planned_qty: i64, 
     pub actual_qty: Option<i64>,
     pub ok_qty: Option<i64>,
@@ -28,6 +31,5 @@ pub struct Cutting {
     pub created_login_key: String,
     pub modified_by: Option<String>,
     pub modified_on: Option<DateTime<Local>>,
-    pub modified_login_key: Option<String>,
-    pub remarks: Option<String>
+    pub modified_login_key: Option<String>
 }
