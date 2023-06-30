@@ -58,29 +58,31 @@ impl FindIncomingSteelRequest {
         let mut steel_vector: Vec<IncomingSteel> = Vec::new();
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_incoming_steel_table;", &[])
+        .query("SELECT * FROM mwspl_incoming_steel_table ORDER BY challan_no ASC, challan_date ASC;", &[])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
         for row in resp.unwrap() {
             steel_vector.push(IncomingSteel {
                 incoming_steel_pk: Uuid::parse_str(row.get(1)).unwrap(),
-                challan_no:row.get(2),
-                challan_date:row.get(3),
+                challan_no: row.get(2),
+                challan_date: row.get(3),
                 steel_code: row.get(4),
-                heat_no:row.get(5),
-                heat_code:row.get(6),
-                jominy_value:row.get(7),
-                received_qty:row.get(8),
-                heat_status:row.get(9),
-                created_by: row.get(10),
-                created_on: row.get(11),
-                created_login_key: row.get(12),
-                modified_by: row.get(13),
-                modified_on: row.get(14),
-                modified_login_key: row.get(15)
+                heat_no: row.get(5),
+                heat_code: row.get(6),
+                jominy_value: row.get(7),
+                received_qty: row.get(8),
+                avail_qty: row.get(9),
+                heat_status: row.get(10),
+                created_by: row.get(11),
+                created_on: row.get(12),
+                created_login_key: row.get(13),
+                modified_by: row.get(14),
+                modified_on: row.get(15),
+                modified_login_key: row.get(16)
             })
         };
+
         match &steel_vector.len() {
             0 => Json(json!(None::<Vec<IncomingSteel>>)),
             _ => Json(json!(steel_vector))
@@ -118,20 +120,21 @@ impl FindIncomingSteelRequest {
         for row in resp.unwrap() {
             steel_vector.push(IncomingSteel {
                 incoming_steel_pk: Uuid::parse_str(row.get(1)).unwrap(),
-                challan_no:row.get(2),
-                challan_date:row.get(3),
+                challan_no: row.get(2),
+                challan_date: row.get(3),
                 steel_code: row.get(4),
-                heat_no:row.get(5),
-                heat_code:row.get(6),
-                jominy_value:row.get(7),
-                received_qty:row.get(8),
-                heat_status:row.get(9),
-                created_by: row.get(10),
-                created_on: row.get(11),
-                created_login_key: row.get(12),
-                modified_by: row.get(13),
-                modified_on: row.get(14),
-                modified_login_key: row.get(15)
+                heat_no: row.get(5),
+                heat_code: row.get(6),
+                jominy_value: row.get(7),
+                received_qty: row.get(8),
+                avail_qty: row.get(9),
+                heat_status: row.get(10),
+                created_by: row.get(11),
+                created_on: row.get(12),
+                created_login_key: row.get(13),
+                modified_by: row.get(14),
+                modified_on: row.get(15),
+                modified_login_key: row.get(16)
             })
         };
         match &steel_vector.len() {

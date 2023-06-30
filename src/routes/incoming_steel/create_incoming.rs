@@ -15,7 +15,7 @@ pub struct CreateIncomingSteelRequest {
     pub heat_no: String,
     pub heat_code: Option<String>,
     pub jominy_value: Option<String>,
-    pub received_qty: i64
+    pub received_qty: f64
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

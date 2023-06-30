@@ -13,6 +13,7 @@ pub struct IncomingSteel {
     pub heat_code: Option<String>,
     pub jominy_value: Option<String>,
     pub received_qty: f64,
+    pub avail_qty: f64,
     pub heat_status: Option<String>,
     pub created_by: Option<String>,
     pub created_on: DateTime<Local>,
