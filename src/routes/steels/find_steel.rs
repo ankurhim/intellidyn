@@ -109,8 +109,7 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
             created_login_key: row.get(10),
             modified_by: row.get(11),
             modified_on: row.get(12),
-            modified_login_key: row.get(13),
-            remarks: row.get(14)
+            modified_login_key: row.get(13)
         })
     };
     match &vector.len() {

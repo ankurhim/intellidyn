@@ -13,8 +13,7 @@ pub struct CreateSteelRequest {
     pub steel_grade: String,
     pub section: i64,
     pub section_type: String,
-    pub jominy_range: Option<String>,
-    pub remarks: Option<String>
+    pub jominy_range: Option<String>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -43,8 +42,7 @@ impl CreateSteelRequest {
             created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
             modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE NO ACTION,
             modified_on TIMESTAMPTZ,
-            modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
-            remarks TEXT,
+            modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION
             UNIQUE (steel_code)
         );", &[])
         .await
@@ -68,43 +66,6 @@ impl CreateSteelRequest {
         match service.client
         .execute(
             "DROP TABLE IF EXISTS mwspl_steel_table;", &[]
-        )
-        .await
-        .map(|val| Json(json!(CreateSteelResponse {
-            data: Some(val.to_string()),
-            error: None
-        })))
-        .map_err(|err| Json(json!(CreateSteelResponse {
-            data: None,
-            error: Some(err.to_string())
-        }))) {
-            Ok(v) => v,
-            Err(e) => e
-        }
-    }
-
-    pub async fn upload_steels(  
-        Extension(service): Extension<Arc<DbService>>,
-    ) -> Json<Value> {
-
-        match service.client
-        .execute(
-            "IMPORT INTO mwspl_steel_table (
-                steel_pk,
-                steel_code,
-                steel_grade,
-                section,
-                section_type,
-                jominy_range,
-                steel_status,
-                created_by,
-                created_on,
-                created_login_key,
-                modified_by,
-                modified_on,
-                modified_login_key,
-                remarks
-            ) CSV DATA ('s3://intellidynbucket/steel.csv?AWS_ACCESS_KEY_ID=AKIARRCN4LBXXWNQXZ4J&AWS_SECRET_ACCESS_KEY=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');", &[]
         )
         .await
         .map(|val| Json(json!(CreateSteelResponse {
@@ -158,9 +119,8 @@ impl CreateSteelRequest {
             created_login_key,
             modified_by,
             modified_on,
-            modified_login_key,
-            remarks
-           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",&[
+            modified_login_key
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",&[
             &Uuid::new_v4().to_string(),
                 &payload.steel_code,
                 &payload.steel_grade,
@@ -173,8 +133,7 @@ impl CreateSteelRequest {
                 &login_key,
                 &None::<String>,
                 &None::<DateTime<Local>>,
-                &None::<String>,
-                &payload.remarks
+                &None::<String>
             ]
         )
         .await
