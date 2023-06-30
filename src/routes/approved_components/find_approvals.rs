@@ -65,14 +65,16 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
     for row in row_vector {
         vector.push(ApprovedComponent {
             approval_pk: Uuid::parse_str(row.get(1)).unwrap(),
-            heat_no: row.get(2),
-            approved_part: row.get(6),
-            created_by: row.get(7),
-            created_on: row.get(8),
-            created_login_key: row.get(9),
-            modified_by: row.get(10),
-            modified_on: row.get(11),
-            modified_login_key: row.get(12)
+            rm_id: row.get(2),
+            heat_no: row.get(3),
+            approved_part: row.get(4),
+            avail_qty: row.get(5),
+            created_by: row.get(6),
+            created_on: row.get(7),
+            created_login_key: row.get(8),
+            modified_by: row.get(9),
+            modified_on: row.get(10),
+            modified_login_key: row.get(11)
         })
     };
     match &vector.len() {

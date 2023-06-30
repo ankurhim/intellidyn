@@ -139,4 +139,39 @@ impl FindIncomingSteelRequest {
             _ => Json(json!(steel_vector))
         }
     }
+
+    pub async fn get_heat_nos_list( 
+        Path((user, login_key)): Path<(String, String)>,
+        Extension(service): Extension<Arc<DbService>>
+    ) -> Json<Value> {
+        let resp = service.client
+        .query(
+            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        )
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+                break;
+            } else {
+                return Json(json!("You are logged out"));
+            }
+        }
+
+        let mut heat_nos: Vec<String> = Vec::new();
+        
+        let resp = service.client
+        .query("SELECT DISTINCT heat_no FROM mwspl_incoming_steel_table;", &[])
+        .await
+        .map_err(|e| Json(json!(e.to_string())));
+
+        for row in resp.unwrap() {
+            heat_nos.push(row.get(1))
+        };
+        match &heat_nos.len() {
+            0 => Json(json!(None::<Vec<String>>)),
+            _ => Json(json!(heat_nos))
+        }
+    }
 }

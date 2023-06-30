@@ -41,8 +41,8 @@ impl CreateApprovedComponentRequest {
                 approval_pk TEXT NOT NULL PRIMARY KEY,
                 rm_id TEXT NOT NULL REFERENCES mwspl_incoming_steel_table(incoming_steel_pk) ON UPDATE CASCADE ON DELETE NO ACTION,
                 heat_no TEXT NOT NULL,
-                avail_qty FLOAT8 NOT NULL,
                 approved_part TEXT NOT NULL REFERENCES mwspl_part_table(part_code) ON UPDATE CASCADE ON DELETE NO ACTION,
+                avail_qty FLOAT8 NOT NULL,
                 created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 created_on TIMESTAMPTZ NOT NULL,
                 created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
@@ -104,21 +104,55 @@ impl CreateApprovedComponentRequest {
         let mut i: u64 = 0;
         if &payload.part_list.len() > &0 {
             for part in &payload.part_list {
+
+                service.client
+                .execute(
+                    "CREATE TABLE IF NOT EXISTS temp_approvals (
+                        approval_pk TEXT NOT NULL PRIMARY KEY,
+                        heat_no TEXT NOT NULL,
+                        approved_part TEXT NOT NULL
+                    )",
+                    &[]
+                )
+                .await;
+
+                service.client
+                .execute(
+                    "INSERT INTO temp_approvals(heat_no, approved_part)",
+                    &[
+                        &payload.heat_no,
+                        &part.to_string(),
+                    ]
+                )
+                .await;
        
                 service.client
                 .execute(
                     "INSERT INTO mwspl_approved_component_table (
                         approval_pk,
+                        rm_id,
                         heat_no,
-                        avail_qty,
                         approved_part,
+                        avail_qty,
                         created_by,
                         created_on,
                         created_login_key,
                         modified_by,
                         modified_on,
                         modified_login_key
-                    ) VALUES ($1, $2, $3, (SELECT received_qty FROM mwspl_incoming_steel_table), $5, $6, $7, $8, $9, $10)",
+                    ) VALUES (
+                        $1,
+                        (SELECT incoming_pk FROM mwspl_incoming_steel_table WHERE heat_no = $2),
+                        $2,
+                        $3,
+                        (SELECT received_qty FROM mwspl_incoming_steel_table WHERE heat_no = $2),
+                        $4,
+                        $5,
+                        $6,
+                        $7,
+                        $8,
+                        $9
+                    )",
                     &[
                         &Uuid::new_v4().to_string(),
                         &payload.heat_no.clone(),
@@ -136,6 +170,10 @@ impl CreateApprovedComponentRequest {
                 .map_err(|e| Json(json!(e.to_string())));
             }
         };
+        
+        service.client
+        .execute("DROP TABLE IF EXISTS temp_approvals;", &[]).await;
+
         Json(json!(i))
     }
 }

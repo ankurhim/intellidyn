@@ -9,6 +9,7 @@ pub mod schedule;
 pub mod steels;
 pub mod parts;
 pub mod cutting;
+pub mod rm_inventory;
 
 use axum::{Router, Extension};
 use std::sync::Arc;
@@ -26,6 +27,7 @@ use crate::routes::{
     requisition::create_requisition_routes,
     schedule::create_schedule_routes,
     cutting::create_cutting_routes,
+    rm_inventory::create_inventory_routes,
 };
 
 pub async fn create_routes() -> Router {
@@ -45,6 +47,7 @@ pub async fn create_routes() -> Router {
     .nest("/requisition/", create_requisition_routes().await)
     .nest("/schedule/", create_schedule_routes().await)
     .nest("/cutting/", create_cutting_routes().await)
+    .nest("/inventory/", create_inventory_routes().await)
     .layer(Extension(client));
 
     routes
