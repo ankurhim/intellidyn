@@ -8,52 +8,54 @@ use serde_json::{Value, json};
 use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CreatePartyRequest {
-    pub party_id: String,
-    pub party_type: String,
-    pub party_name: String,
-    pub party_address: String,
-    pub gstn: String
+pub struct CreateMachineRequest {
+    pub machine_id: String,
+    pub machine_type: String,
+    pub machine_name: String,
+    pub machine_location: String,
+    pub machine_model: String,
+    pub machine_capacity: Option<String>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CreatePartyResponse {
+pub struct CreateMachineResponse {
     pub data: Option<String>,
     pub error: Option<String>
 }
 
-impl CreatePartyRequest {
-    pub async fn create_party_table(
+impl CreateMachineRequest {
+    pub async fn create_machine_table(
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
 
         match service.client
         .execute(
-            "CREATE TABLE IF NOT EXISTS mwspl_party_table(
+            "CREATE TABLE IF NOT EXISTS mwspl_machine_table(
                 id SERIAL NOT NULL,
-                party_pk TEXT NOT NULL,
-                party_id TEXT NOT NULL PRIMARY KEY,
-                party_type TEXT NOT NULL,
-                party_name TEXT NOT NULL,
-                party_address TEXT NOT NULL,
-                gstn TEXT NOT NULL,
-                party_status TEXT,
+                machine_pk TEXT NOT NULL,
+                machine_id TEXT NOT NULL,
+                machine_type TEXT NOT NULL,
+                machine_name TEXT NOT NULL,
+                machine_location TEXT NOT NULL,
+                machine_model TEXT NOT NULL,
+                machine_capacity TEXT NOT NULL,
+                machine_status TEXT,
                 created_by TEXT NOT NULL REFERENCES mwspl_user_table(username) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 created_on TIMESTAMPTZ NOT NULL,
                 created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE NO ACTION,
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
-                UNIQUE (party_id, gstn)
+                UNIQUE (machine_id)
             );",
             &[]
         )
         .await
-        .map(|val| Json(json!(CreatePartyResponse {
+        .map(|val| Json(json!(CreateMachineResponse {
             data: Some(val.to_string()),
             error: None
         })))
-        .map_err(|err| Json(json!(CreatePartyResponse {
+        .map_err(|err| Json(json!(CreateMachineResponse {
             data: None,
             error: Some(err.to_string())
         }))) {
@@ -62,21 +64,21 @@ impl CreatePartyRequest {
         }
     }
 
-    pub async fn drop_party_table(
+    pub async fn drop_machine_table(
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
 
         match service.client
         .execute(
-            "DROP TABLE IF EXISTS mwspl_party_table;",
+            "DROP TABLE IF EXISTS mwspl_machine_table;",
             &[]
         )
         .await
-        .map(|val| Json(json!(CreatePartyResponse {
+        .map(|val| Json(json!(CreateMachineResponse {
             data: Some(val.to_string()),
             error: None
         })))
-        .map_err(|err| Json(json!(CreatePartyResponse {
+        .map_err(|err| Json(json!(CreateMachineResponse {
             data: None,
             error: Some(err.to_string())
         })))  {
@@ -85,7 +87,7 @@ impl CreatePartyRequest {
         }
     }
 
-    pub async fn create_new_party(
+    pub async fn create_new_machine(
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<Self>,
@@ -108,28 +110,30 @@ impl CreatePartyRequest {
         
         match service.client
         .execute(
-            "INSERT INTO mwspl_party_table(
-                party_pk,
-                party_id,
-                party_type,
-                party_name,
-                party_address,
-                gstn,
-                party_status,
+            "INSERT INTO mwspl_machine_table(
+                machine_pk,
+                machine_id,
+                machine_type,
+                machine_name,
+                machine_location,
+                machine_model,
+                machine_capacity,
+                machine_status,
                 created_by,
                 created_on,
                 created_login_key,
                 modified_by,
                 modified_on,
                 modified_login_key
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
             &[
                 &Uuid::new_v4().to_string(),
-                &payload.party_id,
-                &payload.party_type,
-                &payload.party_name,
-                &payload.party_address,
-                &payload.gstn,
+                &payload.machine_id,
+                &payload.machine_type,
+                &payload.machine_name,
+                &payload.machine_location,
+                &payload.machine_model,
+                &payload.machine_capacity,
                 &None::<String>,
                 &user,
                 &Local::now(),
@@ -140,11 +144,11 @@ impl CreatePartyRequest {
             ]
         )
         .await
-        .map(|val| Json(json!(CreatePartyResponse {
+        .map(|val| Json(json!(CreateMachineResponse {
             data: Some(val.to_string()),
             error: None
         })))
-        .map_err(|err| Json(json!(CreatePartyResponse {
+        .map_err(|err| Json(json!(CreateMachineResponse {
             data: None,
             error: Some(err.to_string())
         })))  {

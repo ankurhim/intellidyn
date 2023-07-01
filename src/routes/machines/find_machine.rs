@@ -11,20 +11,20 @@ use tokio_postgres::Row;
 use serde_json::{Value, json};
 
 use crate::service::DbService;
-use crate::routes::party::party_model::Party;
+use crate::routes::machines::machine_model::Machine;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct FindPartyRequest {
+pub struct FindMachineRequest {
     pub filter: Option<String>
 }
 
-impl FindPartyRequest {
-    pub async fn find_party_table(
+impl FindMachineRequest {
+    pub async fn find_machine_table(
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
         match service.client
         .execute(
-            "SELECT * FROM information_schema.tables WHERE table_schema LIKE 'public' AND table_name = 'mwspl_party_table';",
+            "SELECT * FROM information_schema.tables WHERE table_schema LIKE 'public' AND table_name = 'mwspl_machine_table';",
             &[]
         )
         .await
@@ -35,7 +35,7 @@ impl FindPartyRequest {
         }
     }
 
-    pub async fn find_all_parties(
+    pub async fn find_all_machines(
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
@@ -55,17 +55,17 @@ impl FindPartyRequest {
         }
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_party_table WHERE party_stats IS NULL;", &[])
+        .query("SELECT * FROM mwspl_machine_table WHERE machine_status IS NULL;", &[])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
         get_list(resp.unwrap())
     }
 
-    pub async fn find_all_parties_by_filter(
+    pub async fn find_all_machines_by_filter(
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
-        Query(value): Query<FindPartyRequest>
+        Query(value): Query<FindMachineRequest>
     ) -> Json<Value> {
         let resp = service.client
         .query(
@@ -83,7 +83,7 @@ impl FindPartyRequest {
         }
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_party_table WHERE party_id = $1 OR party_name = $1 AND party_status IS NULL;", &[&value.filter])
+        .query("SELECT * FROM mwspl_machine_table WHERE machine_id = $1 OR machine_name = $1 AND machine_status IS NULL;", &[&value.filter])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
@@ -93,27 +93,28 @@ impl FindPartyRequest {
 
 fn get_list(row_vector: Vec<Row>) -> Json<Value> {
     
-    let mut vector: Vec<Party> = Vec::new();
+    let mut vector: Vec<Machine> = Vec::new();
     
     for row in row_vector {
-        vector.push(Party {
-            party_pk: Uuid::parse_str(row.get(1)).unwrap(),
-            party_id: row.get(2),
-            party_type: row.get(3),
-            party_name: row.get(4),
-            party_address: row.get(5),
-            gstn: row.get(6),
-            party_status: row.get(7),
-            created_by: row.get(8),
-            created_on: row.get(9),
-            created_login_key: row.get(10),
-            modified_by: row.get(11),
-            modified_on: row.get(12),
-            modified_login_key: row.get(13)
+        vector.push(Machine {
+            machine_pk: Uuid::parse_str(row.get(1)).unwrap(),
+            machine_id: row.get(2),
+            machine_type: row.get(3),
+            machine_name: row.get(4),
+            machine_location: row.get(5),
+            machine_model: row.get(6),
+            machine_capacity: row.get(7),
+            machine_status: row.get(8),
+            created_by: row.get(9),
+            created_on: row.get(10),
+            created_login_key: row.get(11),
+            modified_by: row.get(12),
+            modified_on: row.get(13),
+            modified_login_key: row.get(14)
         })
     };
     match &vector.len() {
-        0 => Json(json!(None::<Vec<Party>>)),
+        0 => Json(json!(None::<Vec<Machine>>)),
         _ => Json(json!(vector))
     }
 }
