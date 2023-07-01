@@ -55,7 +55,7 @@ impl FindPartyRequest {
         }
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_party_table WHERE party_stats IS NULL;", &[])
+        .query("SELECT * FROM mwspl_party_table WHERE party_status IS NULL;", &[])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 

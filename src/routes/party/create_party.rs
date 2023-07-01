@@ -122,7 +122,7 @@ impl CreatePartyRequest {
                 modified_by,
                 modified_on,
                 modified_login_key
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12 , $13)",
             &[
                 &Uuid::new_v4().to_string(),
                 &payload.party_id,
