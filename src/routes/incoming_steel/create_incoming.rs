@@ -50,7 +50,7 @@ impl CreateIncomingSteelRequest {
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
                 remarks TEXT,
-                UNIQUE (challan_no, heat_no, incoming_steel_pk)
+                UNIQUE (challan_no, heat_no)
             );",
             &[]
         )
