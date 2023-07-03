@@ -58,7 +58,31 @@ impl FindIncomingSteelRequest {
         let mut steel_vector: Vec<IncomingSteel> = Vec::new();
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_incoming_steel_table ORDER BY challan_no ASC, challan_date ASC;", &[])
+        .query("SELECT
+        i.id,
+        incoming_steel_pk,
+        challan_no,
+        challan_date,
+        i.steel_code,
+        steel_grade,
+        section,
+        section_type,
+        heat_no,
+        heat_code,
+        jominy_value,
+        received_qty,
+        avail_qty,
+        heat_status,
+        i.created_by,
+        i.created_on,
+        i.created_login_key,
+        i.modified_by,
+        i.modified_on,
+        i.modified_login_key
+        FROM mwspl_incoming_steel_table i
+        INNER JOIN mwspl_steel_table s
+        ON i.steel_code = s.steel_code
+        ORDER BY challan_no ASC, challan_date ASC;", &[])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
@@ -68,18 +92,21 @@ impl FindIncomingSteelRequest {
                 challan_no: row.get(2),
                 challan_date: row.get(3),
                 steel_code: row.get(4),
-                heat_no: row.get(5),
-                heat_code: row.get(6),
-                jominy_value: row.get(7),
-                received_qty: row.get(8),
-                avail_qty: row.get(9),
-                heat_status: row.get(10),
-                created_by: row.get(11),
-                created_on: row.get(12),
-                created_login_key: row.get(13),
-                modified_by: row.get(14),
-                modified_on: row.get(15),
-                modified_login_key: row.get(16)
+                steel_grade: row.get(5),
+                section: row.get(6),
+                section_type: row.get(7),
+                heat_no: row.get(8),
+                heat_code: row.get(9),
+                jominy_value: row.get(10),
+                received_qty: row.get(11),
+                avail_qty: row.get(12),
+                heat_status: row.get(13),
+                created_by: row.get(14),
+                created_on: row.get(15),
+                created_login_key: row.get(16),
+                modified_by: row.get(17),
+                modified_on: row.get(18),
+                modified_login_key: row.get(19)
             })
         };
 
@@ -113,7 +140,31 @@ impl FindIncomingSteelRequest {
         let mut steel_vector: Vec<IncomingSteel> = Vec::new();
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_incoming_steel_table WHERE challan_no = $1 OR grade = $1 OR heat_no = $1 OR heat_code = $1;", &[&payload.filter])
+        .query("SELECT
+        i.id,
+        incoming_steel_pk,
+        challan_no,
+        challan_date,
+        i.steel_code,
+        steel_grade,
+        section,
+        section_type,
+        heat_no,
+        heat_code,
+        jominy_value,
+        received_qty,
+        avail_qty,
+        heat_status,
+        created_by,
+        created_on,
+        created_login_key,
+        modified_by,
+        modified_on,
+        modified_login_key
+        FROM mwspl_incoming_steel_table i
+        INNER JOIN mwspl_steel_table s
+        ON i.steel_code = s.steel_code
+        WHERE i.challan_no = $1 OR s.steel_grade = $1 OR i.heat_no = $1 OR i.heat_code = $1;", &[&payload.filter])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
@@ -123,18 +174,21 @@ impl FindIncomingSteelRequest {
                 challan_no: row.get(2),
                 challan_date: row.get(3),
                 steel_code: row.get(4),
-                heat_no: row.get(5),
-                heat_code: row.get(6),
-                jominy_value: row.get(7),
-                received_qty: row.get(8),
-                avail_qty: row.get(9),
-                heat_status: row.get(10),
-                created_by: row.get(11),
-                created_on: row.get(12),
-                created_login_key: row.get(13),
-                modified_by: row.get(14),
-                modified_on: row.get(15),
-                modified_login_key: row.get(16)
+                steel_grade: row.get(5),
+                section: row.get(6),
+                section_type: row.get(7),
+                heat_no: row.get(8),
+                heat_code: row.get(9),
+                jominy_value: row.get(10),
+                received_qty: row.get(11),
+                avail_qty: row.get(12),
+                heat_status: row.get(13),
+                created_by: row.get(14),
+                created_on: row.get(15),
+                created_login_key: row.get(16),
+                modified_by: row.get(17),
+                modified_on: row.get(18),
+                modified_login_key: row.get(19)
             })
         };
         match &steel_vector.len() {
