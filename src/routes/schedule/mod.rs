@@ -20,6 +20,7 @@ pub async fn create_schedule_routes() -> Router {
     .route("/drop_schedule_table", post(CreateScheduleRequest::drop_schedule_table))
     .route("/:user/:login_key/truncate_schedule_table", post(CreateScheduleRequest::truncate_schedule_table))
     .route("/:user/:login_key/create_new_schedule", post(CreateScheduleRequest::create_new_schedule))
+    .route("/:user/:login_key/upload_schedule_csv", post(CreateScheduleRequest::upload_schedule_csv))
     .route("/:user/:login_key/find_schedule", get(FindScheduleRequest::find_schedule))
     .route("/:user/:login_key/find_schedule_part_list", get(FindSchedulePartListRequest::find_schedule_part_list))
 }

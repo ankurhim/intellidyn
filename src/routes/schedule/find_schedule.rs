@@ -42,11 +42,10 @@ impl FindScheduleRequest {
 
         match service.client
         .execute(
-            "SELECT * FROM mwspl_schedule_table WHERE schedule_month = $1 AND schedule_year = $2 AND drawing_no = $3;",
+            "SELECT * FROM mwspl_schedule_table WHERE schedule_month = $1 AND schedule_year = $2;",
             &[
                 &Month::from_u32(Local::now().month()).unwrap().name(),
-                &Local::now().year(),
-                &payload.drawing_no
+                &Local::now().year()
             ]
         )
         .await

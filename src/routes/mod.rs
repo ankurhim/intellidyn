@@ -47,7 +47,7 @@ pub async fn create_routes() -> Router {
     .nest("/incoming_steel/", create_incoming_steel_routes().await)
     .nest("/part_approvals/", create_approved_component_routes().await)
     .nest("/requisition/", create_requisition_routes().await)
-    .nest("/schedule/", create_schedule_routes().await)
+    .nest("/schedules/", create_schedule_routes().await)
     .nest("/cutting/", create_cutting_routes().await)
     .nest("/inventory/", create_inventory_routes().await)
     .nest("/machines/", create_machine_routes().await)
