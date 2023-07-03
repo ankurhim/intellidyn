@@ -55,7 +55,31 @@ impl FindPartRequest {
         }
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_part_table WHERE part_status IS NULL;", &[])
+        .query("SELECT
+        p.id,
+        part_pk,
+        part_code,
+        part_no,
+        part_name,
+        dwg_rev_no,
+        p.steel_code,
+        steel_grade,
+        section,
+        section_type,
+        gross_weight,
+        cut_weight,
+        cut_length,
+        part_status,
+        p.created_by,
+        p.created_on,
+        p.created_login_key,
+        p.modified_by,
+        p.modified_on,
+        p.modified_login_key
+        FROM mwspl_part_table p
+        INNER JOIN mwspl_steel_table s
+        ON p.steel_code = s.steel_code
+        WHERE part_status IS NULL;", &[])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
@@ -83,7 +107,31 @@ impl FindPartRequest {
         }
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_part_table WHERE part_code = $1 OR part_grade = $1 AND part_status IS NULL;", &[&value.filter])
+        .query("SELECT
+        p.id,
+        part_pk,
+        part_code,
+        part_no,
+        part_name,
+        dwg_rev_no,
+        p.steel_code,
+        steel_grade,
+        section,
+        section_type,
+        gross_weight,
+        cut_weight,
+        cut_length,
+        part_status,
+        p.created_by,
+        p.created_on,
+        p.created_login_key,
+        p.modified_by,
+        p.modified_on,
+        p.modified_login_key
+        FROM mwspl_part_table p
+        INNER JOIN mwspl_steel_table s
+        ON p.steel_code = s.steel_code
+        WHERE part_code = $1 OR part_grade = $1 AND part_status IS NULL;", &[&value.filter])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
@@ -103,16 +151,19 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
             part_name: row.get(4),
             dwg_rev_no: row.get(5),
             steel_code: row.get(6),
-            gross_weight: row.get(7),
-            cut_weight: row.get(8),
-            cut_length:row.get(9),
-            part_status: row.get(10),
-            created_by: row.get(11),
-            created_on: row.get(12),
-            created_login_key: row.get(13),
-            modified_by: row.get(14),
-            modified_on: row.get(15),
-            modified_login_key: row.get(16)
+            steel_grade: row.get(7),
+            section: row.get(8),
+            section_type: row.get(9),
+            gross_weight: row.get(10),
+            cut_weight: row.get(11),
+            cut_length:row.get(12),
+            part_status: row.get(13),
+            created_by: row.get(14),
+            created_on: row.get(15),
+            created_login_key: row.get(16),
+            modified_by: row.get(17),
+            modified_on: row.get(18),
+            modified_login_key: row.get(19)
         })
     };
     match &vector.len() {
