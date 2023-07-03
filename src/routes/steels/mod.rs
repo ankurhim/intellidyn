@@ -19,6 +19,7 @@ pub async fn create_steel_routes() -> Router {
     .route("/create_steel_table", post(CreateSteelRequest::create_steel_table))
     .route("/drop_steel_table", post(CreateSteelRequest::drop_steel_table))
     .route("/:username/:login_key/create_new_steel", post(CreateSteelRequest::create_new_steel))
+    .route("/:username/:login_key/upload_steel_csv", post(CreateSteelRequest::upload_steel_csv))
     .route("/:username/:login_key/find_all_steels", get(FindSteelRequest::find_all_steels))
     .route("/:username/:login_key/find_all_steels_by_filter", get(FindSteelRequest::find_all_steels_by_filter))
     .route("/:username/:login_key/update_steel", put(UpdateSteelRequest::update_steel))

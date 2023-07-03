@@ -36,23 +36,23 @@ impl FindSteelRequest {
     }
 
     pub async fn find_all_steels(
-        Path((user, login_key)): Path<(String, String)>,
+        // Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
-        let resp = service.client
-        .query(
-            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
-        )
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
+        // let resp = service.client
+        // .query(
+        //     "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        // )
+        // .await
+        // .map_err(|e| Json(json!(e.to_string())));
 
-        for row in resp.unwrap() {
-            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
-                break;
-            } else {
-                return Json(json!("You are logged out"));
-            }
-        }
+        // for row in resp.unwrap() {
+        //     if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+        //         break;
+        //     } else {
+        //         return Json(json!("You are logged out"));
+        //     }
+        // }
         
         let resp = service.client
         .query("SELECT * FROM mwspl_steel_table WHERE steel_status IS NULL;", &[])

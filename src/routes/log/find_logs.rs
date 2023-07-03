@@ -15,7 +15,8 @@ use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FindLogRequest {
-    pub username: Option<String>
+    pub username: Option<String>,
+    pub role: Option<String>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -160,20 +161,20 @@ impl FindLogRequest {
         Query(query): Query<FindLogRequest>
     ) -> Json<Value> {
 
-        let mut login_keys: Vec<String> = vec![];
-
         let resp = service.client
         .query(
-            "SELECT login_key FROM mwspl_log_table WHERE username = $1 AND logout_time IS NULL;", &[&query.username]
+            "SELECT login_key FROM mwspl_log_table WHERE username = $1 AND logout_time IS NULL LIMIT 1;", &[&query.username]
         )
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
+        let mut login_key = String::new();
+
         for row in resp.unwrap() {
-            login_keys.push(row.get(0))
+            login_key = row.get::<usize, String>(0).to_string()
         };
 
-        Json(json!(login_keys))
+        Json(json!((login_key, query.role)))
     }
 
     pub async fn find_count_of_active_log_by_username(

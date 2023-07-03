@@ -86,7 +86,7 @@ impl CreateLogRequest {
         )
         .await
         .map(|_| async {
-            let query = FindLogRequest {username: Some(payload.username) };
+            let query = FindLogRequest {username: Some(payload.username), role: Some(payload.role) };
             FindLogRequest::find_active_log_by_username(Extension(service.clone()), Query(query)).await
         })
         .map_err(|e| Json(json!(e.as_db_error().unwrap().message().to_string())));
