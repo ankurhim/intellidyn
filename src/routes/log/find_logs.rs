@@ -27,23 +27,23 @@ pub struct DateFilterRequest {
 
 impl FindLogRequest {
     pub async fn find_logs(
-        Path((user, login_key)): Path<(String, String)>,
+        // Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
     ) -> Json<Value> {
-        let resp = service.client
-        .query(
-            "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
-        )
-        .await
-        .map_err(|e| Json(json!(e.to_string())));
+        // let resp = service.client
+        // .query(
+        //     "SELECT logout_time FROM mwspl_log_table WHERE username = $1 AND login_key = $2;", &[&user, &login_key]
+        // )
+        // .await
+        // .map_err(|e| Json(json!(e.to_string())));
 
-        for row in resp.unwrap() {
-            if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
-                break;
-            } else {
-                return Json(json!("You are logged out"));
-            }
-        }
+        // for row in resp.unwrap() {
+        //     if row.get::<usize, Option<DateTime<Local>>>(0) == None::<DateTime<Local>> {
+        //         break;
+        //     } else {
+        //         return Json(json!("You are logged out"));
+        //     }
+        // }
 
         let mut log_vector: Vec<Log> = Vec::new();
 
@@ -59,9 +59,10 @@ impl FindLogRequest {
                 log_pk: Uuid::parse_str(row.get(1)).unwrap(),
                 username: row.get(2),
                 login_key: row.get(3),
-                login_time: row.get(4),
-                logout_time: row.get(5),
-                remarks: row.get(6)
+                role: row.get(4),
+                login_time: row.get(5),
+                logout_time: row.get(6),
+                remarks: row.get(7)
             })
         }
 
@@ -101,9 +102,10 @@ impl FindLogRequest {
                 log_pk: Uuid::parse_str(row.get(1)).unwrap(),
                 username: row.get(2),
                 login_key: row.get(3),
-                login_time: row.get(4),
-                logout_time: row.get(5),
-                remarks: row.get(6)
+                role: row.get(4),
+                login_time: row.get(5),
+                logout_time: row.get(6),
+                remarks: row.get(7)
             })
         }
 
@@ -147,9 +149,10 @@ impl FindLogRequest {
                 log_pk: Uuid::parse_str(row.get(1)).unwrap(),
                 username: row.get(2),
                 login_key: row.get(3),
-                login_time: row.get(4),
-                logout_time: row.get(5),
-                remarks: row.get(6)
+                role: row.get(4),
+                login_time: row.get(5),
+                logout_time: row.get(6),
+                remarks: row.get(7)
             })
         }
 

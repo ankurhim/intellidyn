@@ -7,6 +7,7 @@ pub struct Log {
     pub log_pk: Uuid,
     pub username: String,
     pub login_key: String,
+    pub role: String,
     pub login_time: DateTime<Local>,
     pub logout_time: Option<DateTime<Local>>,
     pub remarks: Option<String>

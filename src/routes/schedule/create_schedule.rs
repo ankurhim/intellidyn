@@ -11,7 +11,7 @@ use crate::service::DbService;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateScheduleRequest {
     pub schedule_month: String,
-    pub schedule_year: i64,
+    pub schedule_year: String,
     pub drawing_no: String,
     pub similar_part_no: Option<String>,
     pub customer_plant: String,
@@ -44,7 +44,7 @@ impl CreateScheduleRequest {
                 schedule_pk TEXT NOT NULL,
                 schedule_month TEXT NOT NULL,
                 schedule_year TEXT NOT NULL,
-                drawing_no TEXT NOT NULL REFERENCES mwspl_part_table(part_code) ON UPDATE CASCADE ON DELETE NO ACTION,
+                drawing_no TEXT NOT NULL,
                 similar_part_no TEXT NOT NULL,
                 customer_plant TEXT NOT NULL,
                 supplier_plant TEXT NOT NULL,
@@ -60,7 +60,7 @@ impl CreateScheduleRequest {
                 created_login_key TEXT NOT NULL REFERENCES mwspl_log_table(login_key) ON UPDATE NO ACTION ON DELETE NO ACTION,
                 modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE NO ACTION,
                 modified_on TIMESTAMPTZ,
-                modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION
+                modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
                 UNIQUE (schedule_month, schedule_year, drawing_no)
             );",
             &[]
@@ -157,9 +157,7 @@ impl CreateScheduleRequest {
                 critical_commitment_date,
                 mis_qty,
                 mis_commitment_date,
-                total_forging_qty,
                 recv_till,
-                balance_qty,
                 created_by,
                 created_on,
                 created_login_key,
@@ -202,7 +200,7 @@ impl CreateScheduleRequest {
         Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>
     ) -> Json<Value> {
-        let mut rdr = csv::Reader::from_path("F:/rust_projects/intellidyn/july_schedule.csv").unwrap();
+        let mut rdr = csv::Reader::from_path("D:/rust_projects/intellidyn/july_schedule.csv").unwrap();
         let schedule_vector: Vec<CreateScheduleRequest> = Vec::new();
         let mut counter = 0;
 
@@ -210,20 +208,18 @@ impl CreateScheduleRequest {
             let record = result.unwrap();
             let schedule: CreateScheduleRequest = record.deserialize(None).unwrap();
 
-            println!("{:?}", &schedule);
-
             let most_critical_commit_date = match &schedule.most_critical_commitment_date {
-                Some(v) => Some(NaiveDate::parse_from_str(&v, "%m-%d-%Y").expect("Parsing error")),
+                Some(v) => Some(NaiveDate::parse_from_str(&v, "%m/%d/%Y").expect("Parsing error")),
                 None => None
             };
 
             let critical_commit_date = match &schedule.critical_commitment_date {
-                Some(v) => Some(NaiveDate::parse_from_str(&v, "%m-%d-%Y").expect("Parsing error")),
+                Some(v) => Some(NaiveDate::parse_from_str(&v, "%m/%d/%Y").expect("Parsing error")),
                 None => None
             };
 
             let mis_commit_date = match &schedule.mis_commitment_date {
-                Some(v) => Some(NaiveDate::parse_from_str(&v, "%m-%d-%Y").expect("Parsing error")),
+                Some(v) => Some(NaiveDate::parse_from_str(&v, "%m/%d/%Y").expect("Parsing error")),
                 None => None
             };
 
@@ -243,9 +239,7 @@ impl CreateScheduleRequest {
                     critical_commitment_date,
                     mis_qty,
                     mis_commitment_date,
-                    total_forging_qty,
                     recv_till,
-                    balance_qty,
                     created_by,
                     created_on,
                     created_login_key,
@@ -277,7 +271,8 @@ impl CreateScheduleRequest {
                 ]
             )
             .await
-            .map(|val| {counter = counter + 1});
+            .map(|val| {counter = counter + 1})
+            .map_err(|err| println!("{}",err.to_string()));
         }
 
         Json(json!(CreateScheduleResponse {
