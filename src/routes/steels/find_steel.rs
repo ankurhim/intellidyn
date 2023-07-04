@@ -83,7 +83,7 @@ impl FindSteelRequest {
         }
         
         let resp = service.client
-        .query("SELECT * FROM mwspl_steel_table WHERE steel_code = $1 OR steel_grade = $1 AND steel_status IS NULL;", &[&value.filter])
+        .query("SELECT * FROM mwspl_steel_table WHERE steel_code ILIKE $1 OR steel_grade ILIKE $1 AND steel_status IS NULL;", &[&format!("%{}%", &value.filter.unwrap())])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
