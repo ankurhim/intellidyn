@@ -12,6 +12,7 @@ use crate::service::DbService;
 pub struct CreateSteelRequest {
     pub steel_code: String,
     pub steel_grade: String,
+    pub is_nickel_steel: bool,
     pub section: i64,
     pub section_type: String,
     pub jominy_range: Option<String>
@@ -36,6 +37,7 @@ impl CreateSteelRequest {
             steel_pk TEXT NOT NULL,
             steel_code TEXT NOT NULL PRIMARY KEY,
             steel_grade TEXT NOT NULL,
+            is_nickel_steel BOOLEAN NOT NULL,
             section BIGINT NOT NULL,
             section_type TEXT NOT NULL,
             jominy_range TEXT,
@@ -118,6 +120,7 @@ impl CreateSteelRequest {
             steel_pk,
             steel_code,
             steel_grade,
+            is_nickel_steel,
             section,
             section_type,
             jominy_range,
@@ -128,10 +131,11 @@ impl CreateSteelRequest {
             modified_by,
             modified_on,
             modified_login_key
-           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",&[
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",&[
             &Uuid::new_v4().to_string(),
                 &payload.steel_code,
                 &payload.steel_grade,
+                &payload.is_nickel_steel,
                 &payload.section,
                 &payload.section_type,
                 &payload.jominy_range,
@@ -178,6 +182,7 @@ impl CreateSteelRequest {
                 steel_pk,
                 steel_code,
                 steel_grade,
+                is_nickel_steel,
                 section,
                 section_type,
                 jominy_range,
@@ -188,10 +193,11 @@ impl CreateSteelRequest {
                 modified_by,
                 modified_on,
                 modified_login_key
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",&[
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",&[
                 &Uuid::new_v4().to_string(),
                     &steel.steel_code,
                     &steel.steel_grade,
+                    &steel.is_nickel_steel,
                     &steel.section,
                     &steel.section_type,
                     &steel.jominy_range,

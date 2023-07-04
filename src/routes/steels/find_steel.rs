@@ -100,16 +100,17 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
             steel_pk: Uuid::parse_str(row.get(1)).unwrap(),
             steel_code: row.get(2),
             steel_grade: row.get(3),
-            section: row.get(4),
-            section_type: row.get(5),
-            jominy_range: row.get(6),
-            steel_status: row.get(7),
-            created_by: row.get(8),
-            created_on: row.get(9),
-            created_login_key: row.get(10),
-            modified_by: row.get(11),
-            modified_on: row.get(12),
-            modified_login_key: row.get(13)
+            is_nickel_steel: row.get(4),
+            section: row.get(5),
+            section_type: row.get(6),
+            jominy_range: row.get(7),
+            steel_status: row.get(8),
+            created_by: row.get(9),
+            created_on: row.get(10),
+            created_login_key: row.get(11),
+            modified_by: row.get(12),
+            modified_on: row.get(13),
+            modified_login_key: row.get(14)
         })
     };
     match &vector.len() {

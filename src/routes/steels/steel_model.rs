@@ -8,6 +8,7 @@ pub struct Steel{
     pub steel_pk: Uuid,
     pub steel_code: String,
     pub steel_grade: String,
+    pub is_nickel_steel: bool,
     pub section: i64,
     pub section_type: String,
     pub jominy_range: Option<String>,

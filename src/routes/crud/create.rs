@@ -4,7 +4,7 @@ use std::sync::Arc;
 use chrono::{ DateTime, Local };
 use axum::{Extension, Json, extract::{Path}, http::StatusCode};
 use serde_json::{Value, json};
-use csv::Writer;
+use csv::WriterBuilder;
 
 use crate::service::DbService;
 use crate::routes::crud::response::Response;
@@ -47,8 +47,6 @@ tokio_postgres::types::ToSql>
         &query_string,
         &[
             &Uuid::new_v4().to_string(),
-            &convert_to_csv(payload),       //csv required here
-            &None::<String>,
             &username,
             &Local::now(),
             &login_key,
@@ -75,13 +73,13 @@ tokio_postgres::types::ToSql>
     }
 }
 
-fn convert_to_csv<T: std::fmt::Debug +
+pub fn convert_to_csv<T: std::fmt::Debug +
 Clone + 
 Serialize + 
 for<'a>Deserialize<'a> + 
 std::marker::Sync + 
 tokio_postgres::types::ToSql>(t: T) -> String {
-    let mut wtr = Writer::from_writer(vec![]);
+    let mut wtr = WriterBuilder::new().has_headers(false).from_writer(vec![]);
 
     wtr.serialize(t).unwrap();
 
