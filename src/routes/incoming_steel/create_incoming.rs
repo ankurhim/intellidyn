@@ -2,8 +2,9 @@ use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
 use chrono::{ DateTime, Local, NaiveDate };
-use axum::{Extension, Json, extract::{Path}};
+use axum::{Extension, Json, extract::{Path}, http};
 use serde_json::{Value, json};
+use http_serde;
 
 use crate::service::DbService;
 
@@ -20,6 +21,8 @@ pub struct CreateIncomingSteelRequest {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateIncomingSteelResponse {
+    #[serde(with = "http_serde::status_code")]
+    pub status_code: http::StatusCode,
     pub data: Option<String>,
     pub error: Option<String>
 }
@@ -49,17 +52,18 @@ impl CreateIncomingSteelRequest {
                 modified_by TEXT REFERENCES mwspl_user_table(username) ON UPDATE CASCADE ON DELETE NO ACTION,
                 modified_on TIMESTAMPTZ,
                 modified_login_key TEXT REFERENCES mwspl_log_table(login_key) ON UPDATE CASCADE ON DELETE NO ACTION,
-                remarks TEXT,
-                UNIQUE (challan_no, heat_no)
+                UNIQUE INDEX (challan_no, heat_no)
             );",
             &[]
         )
         .await
         .map(|val| Json(json!(CreateIncomingSteelResponse {
+            status_code: http::StatusCode::OK,
             data: Some(val.to_string()),
             error: None
         })))
         .map_err(|err| Json(json!(CreateIncomingSteelResponse {
+            status_code: http::StatusCode::INTERNAL_SERVER_ERROR,
             data: None,
             error: Some(err.to_string())
         })))  {
@@ -79,10 +83,12 @@ impl CreateIncomingSteelRequest {
         )
         .await
         .map(|val| Json(json!(CreateIncomingSteelResponse {
+            status_code: http::StatusCode::OK,
             data: Some(val.to_string()),
             error: None
         })))
         .map_err(|err| Json(json!(CreateIncomingSteelResponse {
+            status_code: http::StatusCode::INTERNAL_SERVER_ERROR,
             data: None,
             error: Some(err.to_string())
         })))  {
@@ -155,15 +161,80 @@ impl CreateIncomingSteelRequest {
         )
         .await
         .map(|val| Json(json!(CreateIncomingSteelResponse {
+            status_code: http::StatusCode::OK,
             data: Some(val.to_string()),
             error: None
         })))
         .map_err(|err| Json(json!(CreateIncomingSteelResponse {
+            status_code: http::StatusCode::INTERNAL_SERVER_ERROR,
             data: None,
             error: Some(err.to_string())
         })))  {
             Ok(v) => v,
             Err(e) => e
         }
+    }
+
+    pub async fn upload_incoming_steel_csv(
+        Path((user, login_key)): Path<(String, String)>,
+        Extension(service): Extension<Arc<DbService>>
+    ) -> Json<Value> {
+        let mut rdr = csv::Reader::from_path("F:/rust_projects/intellidyn/incoming_steels.csv").unwrap();
+        let incoming_vector: Vec<CreateIncomingSteelRequest> = Vec::new();
+        let mut counter = 0;
+
+        for result in rdr.records() {
+            let record = result.unwrap();
+            let incoming: CreateIncomingSteelRequest = record.deserialize(None).unwrap();
+
+            let challan_date = NaiveDate::parse_from_str(&incoming.challan_date, "%m/%d/%Y").expect("Challan Date parsing error");
+
+            service.client
+            .execute(
+                "INSERT INTO mwspl_incoming_steel_table(
+                    incoming_steel_pk,
+                    challan_no,
+                    challan_date,
+                    steel_code,
+                    heat_no,
+                    heat_code,
+                    jominy_value,
+                    received_qty,
+                    avail_qty,
+                    heat_status,
+                    created_by,
+                    created_on,
+                    created_login_key,
+                    modified_by,
+                    modified_on,
+                    modified_login_key
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",&[
+                    &Uuid::new_v4().to_string(),
+                    &incoming.challan_no,
+                    &challan_date,
+                    &incoming.steel_code,
+                    &incoming.heat_no,
+                    &incoming.heat_code,
+                    &incoming.jominy_value,
+                    &incoming.received_qty,
+                    &incoming.received_qty,
+                    &None::<String>,
+                    &user,
+                    &Local::now(),
+                    &login_key,
+                    &None::<String>,
+                    &None::<DateTime<Local>>,
+                    &None::<String>
+                ]
+            )
+            .await
+            .map(|val| {counter = counter + 1});
+        }
+
+        Json(json!(CreateIncomingSteelResponse {
+            status_code: http::StatusCode::OK,
+            data: Some(format!("{} data entries successful", counter)),
+            error: None
+        }))
     }
 }

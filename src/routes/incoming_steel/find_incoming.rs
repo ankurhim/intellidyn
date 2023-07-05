@@ -155,16 +155,16 @@ impl FindIncomingSteelRequest {
         received_qty,
         avail_qty,
         heat_status,
-        created_by,
-        created_on,
-        created_login_key,
-        modified_by,
-        modified_on,
-        modified_login_key
+        i.created_by,
+        i.created_on,
+        i.created_login_key,
+        i.modified_by,
+        i.modified_on,
+        i.modified_login_key
         FROM mwspl_incoming_steel_table i
         INNER JOIN mwspl_steel_table s
         ON i.steel_code = s.steel_code
-        WHERE i.challan_no = $1 OR s.steel_grade = $1 OR i.heat_no = $1 OR i.heat_code = $1;", &[&payload.filter])
+        WHERE i.challan_no ILIKE $1 OR s.steel_grade ILIKE $1 OR i.heat_no ILIKE $1 OR i.heat_code ILIKE $1 AND heat_status IS NULL;", &[&format!("%{}%", &payload.filter.unwrap())])
         .await
         .map_err(|e| Json(json!(e.to_string())));
 
