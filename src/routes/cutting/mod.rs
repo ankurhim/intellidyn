@@ -3,7 +3,7 @@ pub mod create_cutting;
 
 use axum::{
     Router,
-    routing::{post, get, put},
+    routing::{post},
 };
 
 use self::{
@@ -12,7 +12,7 @@ use self::{
 
 pub async fn create_cutting_routes() -> Router {
     Router::new()
-    .route("/create_cutting_temp_table", post(CreateCuttingRequest::create_cutting_temp_table))
+    .route("/create_cutting_plan", post(CreateCuttingRequest::create_cutting_plan))
     .route("/drop_cutting_table", post(CreateCuttingRequest::drop_cutting_table))
     // .route("/drop_bill_of_material_table", post(CreateBillOfMaterialRequest::drop_bill_of_material_table))
     // .route("/:user/:login_key/create_new_bill_of_material", post(CreateBillOfMaterialRequest::create_new_bill_of_material))

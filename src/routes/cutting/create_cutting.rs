@@ -2,11 +2,10 @@ use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
 use chrono::{ DateTime, Local, NaiveDate };
-use axum::{Extension, Json, extract::{Path}, http::StatusCode};
+use axum::{Extension, Json, extract::{Path}};
 use serde_json::{Value, json};
 
 use crate::service::DbService;
-use crate::routes::requisition::requisition_model::Requisition;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateCuttingRequest {
@@ -20,7 +19,8 @@ pub struct CreateCuttingRequest {
 }
 
 impl CreateCuttingRequest {
-    pub async fn create_cutting_temp_table(
+    pub async fn create_cutting_plan(
+        Path((user, login_key)): Path<(String, String)>,
         Extension(service): Extension<Arc<DbService>>,
         Json(payload): Json<Self>
     ) -> Json<Value> {
@@ -76,9 +76,9 @@ impl CreateCuttingRequest {
                 &payload.steel_code,
                 &payload.heat_no,
                 &payload.planned_qty,
-                &"admin",
+                &user,
                 &Local::now(),
-                &"test",
+                &login_key,
                 &None::<String>,
                 &None::<DateTime<Local>>,
                 &None::<String>,
@@ -126,13 +126,18 @@ impl CreateCuttingRequest {
 
         println!("{:?}", create_cutting_table);
 
-        service.client
+        match service.client
         .execute(
             "UPDATE mwspl_requisition_table
             SET request_status = 'CLOSED'
             WHERE requisition_id = $1", &[&payload.requisition_id]
         )
-        .await;
+        .await
+        .map(|v| v)
+        .map_err(|e| e) {
+            Ok(_) => (),
+            Err(e) => {return Json(json!(e.to_string()));}
+        };
 
         let insert = service.client
         .execute(
@@ -204,11 +209,14 @@ impl CreateCuttingRequest {
 
         println!("{:?}", insert);
 
-        service.client
+        match service.client
         .execute("DROP TABLE IF EXISTS mwspl_cutting_temp;", &[])
-        .await;
-
-
+        .await
+        .map(|v| v)
+        .map_err(|e| e) {
+            Ok(_) => (),
+            Err(e) => {return Json(json!(e.to_string()));}
+        };
 
         match insert {
             Ok(v) => v,

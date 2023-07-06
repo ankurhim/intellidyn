@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
-use chrono::{ DateTime, Local, NaiveDate };
+use chrono::{ DateTime, Local };
 use axum::{Extension, Json, extract::{Path}, http};
 use serde_json::{Value, json};
 use http_serde;
@@ -176,7 +176,7 @@ impl CreateSteelRequest {
             let record = result.unwrap();
             let steel: CreateSteelRequest = record.deserialize(None).unwrap();
 
-            service.client
+            match service.client
             .execute(
             "INSERT INTO mwspl_steel_table(
                 steel_pk,
@@ -211,7 +211,11 @@ impl CreateSteelRequest {
                 ]
             )
             .await
-            .map(|val| {counter = counter + 1});
+            .map(|val| {counter = counter + 1})
+            .map_err(|e| ()) {
+                Ok(v) => (),
+                Err(e) => ()
+            };
         }
 
         Json(json!(CreateSteelResponse {

@@ -4,7 +4,7 @@ pub mod find_parts;
 
 use axum::{
     Router,
-    routing::{post, get, put},
+    routing::{post, get},
 };
 
 use self::{

@@ -11,9 +11,7 @@ use axum::{
 use serde_json::{Value, json};
 
 use crate::routes::approved_components::approved_components_model::ApprovedComponent;
-use crate::routes::users::user_model::User;
 use crate::service::DbService;
-use crate::error::AppError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FindApprovedHeatsRequest {

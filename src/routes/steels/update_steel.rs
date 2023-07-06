@@ -1,16 +1,13 @@
 use serde::{Serialize, Deserialize };
-use uuid::Uuid;
 use std::sync::Arc;
 use axum::{
     Extension,
     Json,
-    extract::{Query, Path}
+    extract::Path
 };
 use chrono::{DateTime, Local};
-use bcrypt::{hash, DEFAULT_COST};
 use serde_json::{Value, json};
 
-use crate::routes::steels::steel_model::Steel;
 use crate::service::DbService;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

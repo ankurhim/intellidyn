@@ -1,20 +1,16 @@
 use serde::{Serialize, Deserialize };
-use uuid::Uuid;
 use chrono::{Local, DateTime};
 use std::sync::Arc;
 use axum::{
     Extension,
     Json,
-    extract::Path,
-    http
+    extract::Path
 };
 
 use serde_json::{Value, json};
 
 use crate::routes::rm_inventory::rm_inventory_model::RMInventory;
-use crate::routes::users::user_model::User;
 use crate::service::DbService;
-use crate::error::AppError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateRMInventoryRequest;

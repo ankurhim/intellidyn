@@ -1,18 +1,15 @@
 use serde::{Serialize, Deserialize };
-use uuid::Uuid;
 use std::sync::Arc;
 use chrono::{ DateTime, Local, Datelike,Month };
 use axum::{
     Extension,
     Json,
-    extract::{Query, Path}
+    extract::Path
 };
-use tokio_postgres::Row;
 use serde_json::{Value, json};
 use num_traits::FromPrimitive;
 
 use crate::service::DbService;
-use crate::routes::requisition::requisition_model::Requisition;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FindSchedulePartListRequest;

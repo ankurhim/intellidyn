@@ -5,13 +5,12 @@ pub mod update_bom;
 
 use axum::{
     Router,
-    routing::{post, get, put},
+    routing::{post, get},
 };
 
 use self::{
     create_bom::CreateBillOfMaterialRequest,
     find_bom::FindBillOfMaterialRequest,
-    update_bom::UpdateBillOfMaterialRequest
 };
 
 pub async fn create_bill_of_material_routes() -> Router {

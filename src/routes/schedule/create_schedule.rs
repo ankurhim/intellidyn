@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
-use chrono::{ DateTime, Local, NaiveDate, Month };
+use chrono::{ DateTime, Local, NaiveDate };
 use axum::{Extension, Json, extract::{Path}, http};
 use serde_json::{Value, json};
 use http_serde;
@@ -223,7 +223,7 @@ impl CreateScheduleRequest {
                 None => None
             };
 
-            service.client
+            match service.client
             .execute(
                 "INSERT INTO mwspl_schedule_table (
                     schedule_pk,
@@ -272,7 +272,10 @@ impl CreateScheduleRequest {
             )
             .await
             .map(|val| {counter = counter + 1})
-            .map_err(|err| println!("{}",err.to_string()));
+            .map_err(|err| ()) {
+                Ok(_) => (),
+                Err(e) => ()
+            };
         }
 
         Json(json!(CreateScheduleResponse {

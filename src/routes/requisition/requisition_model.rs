@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
-use chrono::{DateTime, naive::NaiveDate, Local};
+use chrono::{DateTime, Local};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Requisition {

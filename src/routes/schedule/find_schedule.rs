@@ -1,15 +1,14 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
-use chrono::{ DateTime, Local, Datelike,Month };
+use chrono::{ DateTime, Local };
 use axum::{
     Extension,
     Json,
-    extract::{Query, Path}
+    extract::Path
 };
 use tokio_postgres::Row;
 use serde_json::{Value, json};
-use num_traits::FromPrimitive;
 
 use crate::service::DbService;
 use crate::routes::schedule::schedule_model::Schedule;

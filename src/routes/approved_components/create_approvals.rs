@@ -10,10 +10,7 @@ use axum::{
 
 use serde_json::{Value, json};
 
-use crate::routes::approved_components::ApprovedComponent;
-use crate::routes::users::user_model::User;
 use crate::service::DbService;
-use crate::error::AppError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateApprovedComponentRequest {
@@ -105,7 +102,7 @@ impl CreateApprovedComponentRequest {
         if &payload.part_list.len() > &0 {
             for part in &payload.part_list {
 
-                service.client
+                match service.client
                 .execute(
                     "CREATE TABLE IF NOT EXISTS temp_approvals (
                         approval_pk TEXT NOT NULL PRIMARY KEY,
@@ -114,9 +111,14 @@ impl CreateApprovedComponentRequest {
                     )",
                     &[]
                 )
-                .await;
+                .await
+                .map(|v| v)
+                .map_err(|e| e.to_string()) {
+                    Ok(v) => v,
+                    Err(e) => 0
+                };
 
-                service.client
+                match service.client
                 .execute(
                     "INSERT INTO temp_approvals(heat_no, approved_part)",
                     &[
@@ -124,9 +126,14 @@ impl CreateApprovedComponentRequest {
                         &part.to_string(),
                     ]
                 )
-                .await;
+                .await
+                .map(|v| v)
+                .map_err(|e| e.to_string()) {
+                    Ok(v) => v,
+                    Err(e) => 0
+                };
        
-                service.client
+                match service.client
                 .execute(
                     "INSERT INTO mwspl_approved_component_table (
                         approval_pk,
@@ -167,13 +174,19 @@ impl CreateApprovedComponentRequest {
                 )
                 .await
                 .map(|val| i += val)
-                .map_err(|e| Json(json!(e.to_string())));
+                .map_err(|e| Json(json!(e.to_string()))) {
+                    Ok(_) => (),
+                    Err(_) => ()
+                };
             }
         };
         
-        service.client
-        .execute("DROP TABLE IF EXISTS temp_approvals;", &[]).await;
-
-        Json(json!(i))
+        match service.client
+        .execute("DROP TABLE IF EXISTS temp_approvals;", &[]).await
+        .map(|v| Json(json!(v.to_string())))
+        .map_err(|e| Json(json!(e.to_string()))) {
+            Ok(v) => Json(json!(i)),
+            Err(e) => e
+        }
     }
 }

@@ -11,6 +11,7 @@ pub mod parts;
 pub mod cutting;
 pub mod rm_inventory;
 pub mod machines;
+pub mod response;
 
 use axum::{Router, Extension};
 use std::sync::Arc;

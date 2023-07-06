@@ -3,7 +3,7 @@ pub mod create_inventory;
 
 use axum::{
     Router,
-    routing::{get, post, put},
+    routing::{get},
 };
 
 use self::{

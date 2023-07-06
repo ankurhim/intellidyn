@@ -1,6 +1,4 @@
 use serde::{Serialize, Deserialize };
-use chrono::{Local, DateTime};
-use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RMInventory {

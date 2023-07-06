@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 
-use chrono::{DateTime, Local, NaiveDate};
+use chrono::{DateTime, Local };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Steel{

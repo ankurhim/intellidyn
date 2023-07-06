@@ -1,6 +1,6 @@
 use serde::{ Serialize, Deserialize };
 use uuid::Uuid;
-use chrono::{ DateTime, Local, Month, NaiveDate };
+use chrono::{ DateTime, Local, NaiveDate };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Schedule {

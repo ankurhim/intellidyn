@@ -1,7 +1,7 @@
 /// Dependencies imports
 use uuid::Uuid;
 use std::sync::Arc;
-use axum::{Extension, Json, extract::Path};
+use axum::{Extension, Json};
 use serde_json::{Value, json};
 use bcrypt::{ hash, DEFAULT_COST };
 use serde::{Serialize, Deserialize };

@@ -1,8 +1,8 @@
 use serde::{Serialize, Deserialize };
 use uuid::Uuid;
 use std::sync::Arc;
-use chrono::{ DateTime, Local, NaiveDate };
-use axum::{Extension, Json, extract::{Path}};
+use chrono::{ DateTime, Local };
+use axum::{Extension, Json, extract::Path};
 use serde_json::{Value, json};
 
 use crate::service::DbService;

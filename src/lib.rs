@@ -1,7 +1,6 @@
 pub mod service;
 pub mod test;
 pub mod routes;
-pub mod error;
 
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use crate::routes::create_routes;

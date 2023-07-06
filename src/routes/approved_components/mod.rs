@@ -6,11 +6,10 @@ pub mod find_approvals;
 
 use axum::{
     Router,
-    routing::{get, post, delete, put},
+    routing::{get, post},
 };
 
 use self::{
-    approved_components_model::ApprovedComponent,
     create_approvals::CreateApprovedComponentRequest,
     find_approvals::FindApprovedHeatsRequest,
     // delete_approvals::DeleteApprovedComponentRequest,
