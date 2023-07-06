@@ -17,5 +17,6 @@ pub async fn create_part_routes() -> Router {
     .route("/create_part_table", post(CreatePartRequest::create_part_table))
     .route("/drop_part_table", post(CreatePartRequest::drop_part_table))
     .route("/:user/:login_key/create_new_part", post(CreatePartRequest::create_new_part))
+    .route("/:user/:login_key/upload_part_csv", post(CreatePartRequest::upload_part_csv))
     .route("/:user/:login_key/find_all_parts", get(FindPartRequest::find_all_parts))
 }

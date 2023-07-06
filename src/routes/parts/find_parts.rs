@@ -66,9 +66,6 @@ impl FindPartRequest {
         steel_grade,
         section,
         section_type,
-        gross_weight,
-        cut_weight,
-        cut_length,
         part_status,
         p.created_by,
         p.created_on,
@@ -118,9 +115,6 @@ impl FindPartRequest {
         steel_grade,
         section,
         section_type,
-        gross_weight,
-        cut_weight,
-        cut_length,
         part_status,
         p.created_by,
         p.created_on,
@@ -154,16 +148,13 @@ fn get_list(row_vector: Vec<Row>) -> Json<Value> {
             steel_grade: row.get(7),
             section: row.get(8),
             section_type: row.get(9),
-            gross_weight: row.get(10),
-            cut_weight: row.get(11),
-            cut_length:row.get(12),
-            part_status: row.get(13),
-            created_by: row.get(14),
-            created_on: row.get(15),
-            created_login_key: row.get(16),
-            modified_by: row.get(17),
-            modified_on: row.get(18),
-            modified_login_key: row.get(19)
+            part_status: row.get(10),
+            created_by: row.get(11),
+            created_on: row.get(12),
+            created_login_key: row.get(13),
+            modified_by: row.get(14),
+            modified_on: row.get(15),
+            modified_login_key: row.get(16)
         })
     };
     match &vector.len() {
